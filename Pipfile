@@ -12,6 +12,7 @@ sqlalchemy-serializer = "*"
 flask-restful = "*"
 flask-cors = "*"
 faker = "*"
+python-dotenv = "*"
 
 [requires]
 python_full_version = "3.8.13"
