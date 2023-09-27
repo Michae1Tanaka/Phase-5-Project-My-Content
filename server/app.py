@@ -5,19 +5,12 @@
 # Remote library imports
 from flask import request
 from flask_restful import Resource
-import os
-from dotenv import load_dotenv
-
 
 # Local imports
 from config import app, db, api
 
 # Add your model imports
 
-
-load_dotenv()
-secret_key = os.environ.get("Test")
-print(secret_key)
 
 # Views go here!
 
