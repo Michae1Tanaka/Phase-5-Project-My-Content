@@ -15,7 +15,7 @@ import os
 
 
 # Local imports
-
+# from models import User
 
 # Instantiate app, set attributes
 app = Flask(__name__)
