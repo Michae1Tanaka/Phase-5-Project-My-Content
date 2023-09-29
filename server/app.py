@@ -20,6 +20,18 @@ def index():
     return "<h1>Project Server</h1>"
 
 
+@app.route("/login", methods=["POST"])
+def login():
+    if request.method == "POST":
+        data = request.get_json()
+        user = User.query.filter_by(username=data.get("username")).first()
+        if user and user.authenticate(data.get("password")):
+            session["user_id"] = user.id
+            return jsonify(user.to_dict()), 200
+        else:
+            return jsonify({"message": "Invalid username or password"}), 401
+
+
 class Users(Resource):
     def get(self):
         users = User.query.all()

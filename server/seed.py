@@ -36,6 +36,9 @@ if __name__ == "__main__":
             user.password_hash = user.username + "password"
 
             users.append(user)
+        test_user = User(username="potato", is_admin=True)
+        test_user.password_hash = "potato"
+        users.append(test_user)
 
         db.session.add_all(users)
 
