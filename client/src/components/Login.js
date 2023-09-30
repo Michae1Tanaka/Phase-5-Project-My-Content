@@ -14,6 +14,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 
 const defaultTheme = createTheme();
 const SignInSchema = Yup.object().shape({
@@ -22,9 +23,11 @@ const SignInSchema = Yup.object().shape({
 });
 
 export default function SignIn() {
-  const [user, setUser] = React.useState({});
+  const [user, setUser] = React.useState(null);
   const [errors, setErrors] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = (values, { setSubmitting }) => {
     setIsLoading(true);
@@ -39,11 +42,12 @@ export default function SignIn() {
       if (r.ok) {
         r.json().then((currentUser) => {
           setUser(currentUser);
-          console.log(currentUser);
+          navigate("/");
         });
       } else {
-        r.json().then((err) => setErrors(err.errors));
-        console.log(errors);
+        r.json().then((err) => {
+          setErrors(err);
+        });
       }
       setSubmitting(false);
     });
@@ -90,6 +94,7 @@ export default function SignIn() {
                       autoFocus
                       error={meta.touched && !!meta.error}
                       helperText={meta.touched && meta.error}
+                      autoComplete="username"
                     />
                   )}
                 </Field>
@@ -131,6 +136,7 @@ export default function SignIn() {
             <Link href="#" variant="body2">
               {"Don't have an account? Sign Up"}
             </Link>
+            <p style={{ color: "red" }}>{errors.message}</p>
           </Grid>
         </Box>
       </Container>
