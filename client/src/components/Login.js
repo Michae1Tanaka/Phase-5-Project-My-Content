@@ -71,6 +71,7 @@ export default function SignIn() {
             initialValues={{
               username: "",
               password: "",
+              remember_me: false,
             }}
             validationSchema={SignInSchema}
             onSubmit={handleSubmit}
@@ -108,7 +109,11 @@ export default function SignIn() {
                     />
                   )}
                 </Field>
-                <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
+                <Field name="remember_me" type="checkbox">
+                  {({ field }) => (
+                    <FormControlLabel control={<Checkbox {...field} color="primary" />} label="Remember me" />
+                  )}
+                </Field>
                 <Button
                   type="submit"
                   fullWidth

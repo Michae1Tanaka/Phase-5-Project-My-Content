@@ -24,9 +24,17 @@ def index():
 def login():
     if request.method == "POST":
         data = request.get_json()
-        user = User.query.filter_by(username=data.get("username")).first()
-        if user and user.authenticate(data.get("password")):
+        username = data.get("username")
+        password = data.get("password")
+        remember_me = data.get("remember_me", False)
+        user = User.query.filter_by(username=username).first()
+        if user and user.authenticate(password):
             session["user_id"] = user.id
+            if data.get("remember_me"):
+                session.permanent = True
+            else:
+                session.permanent = False
+
             return jsonify(user.to_dict()), 200
         else:
             return jsonify({"message": "Invalid username or password"}), 401
