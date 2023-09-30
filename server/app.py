@@ -30,7 +30,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.authenticate(password):
             session["user_id"] = user.id
-            if data.get("remember_me"):
+            if remember_me:
                 session.permanent = True
             else:
                 session.permanent = False
