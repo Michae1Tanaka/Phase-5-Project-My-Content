@@ -9,12 +9,13 @@ from config import db, bcrypt
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
-    serialize_rules = ("-password_hash", "-_password_hash")
+    serialize_rules = ("-password_hash", "-_password_hash", "-content")
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
     _password_hash = db.Column(db.String)
-    is_admin = db.Column(db.Boolean, default=False, nullable=False)
+
+    content = db.relationship("Content", backref="user", lazy="dynamic")
 
     @hybrid_property
     def password_hash(self):
@@ -45,3 +46,20 @@ class User(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f"Username: {self.username}"
+
+
+class Content(db.Model, SerializerMixin):
+    __tablename__ = "content"
+
+    serialize_rules = "-user_id"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String, nullable=False)
+    thumbnail = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=False)
+    uploaded_at = db.Column(db.DateTime, server_default=db.func.now())
+    created_at = db.Column(db.DateTime)
+    url = db.Column(db.String, nullable=False)
+    type = db.Column(db.String, nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
