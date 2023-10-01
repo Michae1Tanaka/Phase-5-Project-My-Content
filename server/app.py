@@ -10,7 +10,7 @@ from flask_restful import Resource
 from config import app, db, api
 
 # Add your model imports
-from models import User
+from models import User, Content
 
 # Views go here!
 
@@ -38,6 +38,15 @@ def login():
             return jsonify(user.to_dict()), 200
         else:
             return jsonify({"message": "Invalid username or password"}), 401
+
+
+class CheckSession(Resource):
+    def get(self):
+        if session.get("user_id"):
+            user = User.query.filter_by(id=session["user_id"]).first()
+            return user.to_dict(), 200
+        elif not session["user_id"]:
+            return {"message": "Unauthorized Request."}, 401
 
 
 class SignUp(Resource):
@@ -72,18 +81,8 @@ class SignUp(Resource):
         return user.to_dict(), 201
 
 
-class Users(Resource):
-    def get(self):
-        users = User.query.all()
-        if not users:
-            return [], 200
-
-        return [user.to_dict() for user in users], 200
-
-
-api.add_resource(Users, "/users")
 api.add_resource(SignUp, "/signup")
-
+api.add_resource(CheckSession, "/check_session")
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
