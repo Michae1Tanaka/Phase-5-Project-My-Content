@@ -55,6 +55,10 @@ class SignUp(Resource):
             return {"message": "Username and password are required."}, 422
 
         user = User(username=username, is_admin=False)
+
+        if len(data.get("password")) < 8:
+            return {"message": "Passwords must be at least 8 characters."}
+
         user.password_hash = data.get("password")
 
         session["user_id]"] = user.id

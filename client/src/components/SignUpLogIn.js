@@ -23,8 +23,11 @@ const SignInSchema = Yup.object().shape({
 });
 
 const signupSchema = Yup.object().shape({
-  username: Yup.string().required("Username is required."),
-  password: Yup.string().required("Password is required."),
+  username: Yup.string()
+    .required("Username is required.")
+    .min(3, "Usernames must be a minimum of 3 characters.")
+    .max(15, "Usernames cannot be more than 15 characters."),
+  password: Yup.string().required("Password is required.").min(8, "Passwords must be a minimum of 8 characters."),
 });
 
 export default function SignInLogIn() {
