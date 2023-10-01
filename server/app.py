@@ -81,8 +81,19 @@ class SignUp(Resource):
         return user.to_dict(), 201
 
 
+class Videos(Resource):
+    def get(self):
+        user_id = session.get("user_id")
+        if user_id:
+            videos = Content.query.filter_by(user_id=user_id, type="Video").all()
+            return [video.to_dict() for video in videos], 200
+        else:
+            return {"message": "Unauthorized Request."}, 401
+
+
 api.add_resource(SignUp, "/signup")
 api.add_resource(CheckSession, "/check_session")
+api.add_resource(Videos, "/videos")
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)

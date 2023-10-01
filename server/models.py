@@ -49,7 +49,7 @@ class User(db.Model, SerializerMixin):
 class Content(db.Model, SerializerMixin):
     __tablename__ = "content"
 
-    serialize_rules = "-user_id"
+    serialize_rules = ("-user_id",)
 
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.String, nullable=False, server_default="Unknown")

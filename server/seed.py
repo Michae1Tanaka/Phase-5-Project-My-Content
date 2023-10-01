@@ -78,10 +78,10 @@ if __name__ == "__main__":
                 user_id=rc(user_ids),
             )
             if x < 33:
-                content.type = "Videos"
+                content.type = "Video"
                 content.url = rc(video_links)
             elif 33 <= x < 66:
-                content.type = "Articles"
+                content.type = "Article"
                 content.url = rc(articles_links)
             else:
                 content.type = "Other"
