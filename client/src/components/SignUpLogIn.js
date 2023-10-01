@@ -14,7 +14,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useMatch } from "react-router-dom";
 
 const defaultTheme = createTheme();
 const SignInSchema = Yup.object().shape({
@@ -22,16 +22,26 @@ const SignInSchema = Yup.object().shape({
   password: Yup.string().required("Password is required."),
 });
 
-export default function SignIn() {
+const signupSchema = Yup.object().shape({
+  username: Yup.string().required("Username is required."),
+  password: Yup.string().required("Password is required."),
+});
+
+export default function SignInLogIn() {
   const [user, setUser] = React.useState(null);
   const [errors, setErrors] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const navigate = useNavigate();
 
+  const isLogin = useMatch("/login");
+
   const handleSubmit = (values, { setSubmitting }) => {
+    const endpoint = isLogin ? "/login" : "/signup";
+
     setIsLoading(true);
-    fetch("/login", {
+
+    fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,6 +63,22 @@ export default function SignIn() {
     });
   };
 
+  function signUpOrLogInLink() {
+    if (isLogin) {
+      return (
+        <Link href="/signup" variant="body2" color="primary">
+          {"Don't have an account? Sign Up"}
+        </Link>
+      );
+    } else {
+      return (
+        <Link href="/login" variant="body2" color="secondary">
+          {"Already have an account? Sign In"}
+        </Link>
+      );
+    }
+  }
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -65,11 +91,11 @@ export default function SignIn() {
             alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <Avatar sx={{ m: 1, bgcolor: isLogin ? "primary.main" : "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            {isLogin ? "Sign In" : "Sign Up"}
           </Typography>
           <Formik
             initialValues={{
@@ -77,7 +103,7 @@ export default function SignIn() {
               password: "",
               remember_me: false,
             }}
-            validationSchema={SignInSchema}
+            validationSchema={isLogin ? SignInSchema : signupSchema}
             onSubmit={handleSubmit}
           >
             {({ isSubmitting }) => (
@@ -95,6 +121,7 @@ export default function SignIn() {
                       error={meta.touched && !!meta.error}
                       helperText={meta.touched && meta.error}
                       autoComplete="username"
+                      color={isLogin ? "primary" : "secondary"}
                     />
                   )}
                 </Field>
@@ -111,31 +138,33 @@ export default function SignIn() {
                       id="password"
                       error={meta.touched && !!meta.error}
                       helperText={meta.touched && meta.error}
+                      color={isLogin ? "primary" : "secondary"}
                     />
                   )}
                 </Field>
                 <Field name="remember_me" type="checkbox">
                   {({ field }) => (
-                    <FormControlLabel control={<Checkbox {...field} color="primary" />} label="Remember me" />
+                    <FormControlLabel
+                      control={<Checkbox {...field} color={isLogin ? "primary" : "secondary"} />}
+                      label="Remember me"
+                    />
                   )}
                 </Field>
                 <Button
+                  color={isLogin ? "primary" : "secondary"}
                   type="submit"
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
                   disabled={isSubmitting || isLoading}
                 >
-                  {isLoading ? "Loading..." : "Sign In"}
+                  {isLoading ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
                 </Button>
               </Form>
             )}
           </Formik>
           <Grid container>
-            {/* Dont forget to update href for signup */}
-            <Link href="#" variant="body2">
-              {"Don't have an account? Sign Up"}
-            </Link>
+            {signUpOrLogInLink()}
             <p style={{ color: "red" }}>{errors.message}</p>
           </Grid>
         </Box>

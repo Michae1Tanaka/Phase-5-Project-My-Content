@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./Login";
+import Login from "./SignUpLogIn";
 import HomePage from "./HomePage";
 
 function App() {
@@ -8,7 +8,8 @@ function App() {
     <Router>
       <Routes>
         <Route exact path="/" Component={HomePage} />
-        <Route exact path="/login" Component={Login} />
+        <Route path="/login" Component={Login} />
+        <Route path="/signup" Component={Login} />
       </Routes>
     </Router>
   );

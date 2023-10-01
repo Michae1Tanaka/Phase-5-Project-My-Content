@@ -40,6 +40,34 @@ def login():
             return jsonify({"message": "Invalid username or password"}), 401
 
 
+class SignUp(Resource):
+    def post(self):
+        data = request.get_json()
+        usernames = [user.username for user in User.query.all()]
+
+        username = data.get("username")
+        remember_me = data.get("remember_me")
+
+        if username in usernames:
+            return {"message": "That username is already taken."}, 409
+
+        if not username or not data.get("password"):
+            return {"message": "Username and password are required."}, 422
+
+        user = User(username=username, is_admin=False)
+        user.password_hash = data.get("password")
+
+        session["user_id]"] = user.id
+        if remember_me:
+            session.permanent = True
+        else:
+            session.permanent = False
+
+        db.session.add(user)
+        db.session.commit()
+        return user.to_dict(), 201
+
+
 class Users(Resource):
     def get(self):
         users = User.query.all()
@@ -50,6 +78,7 @@ class Users(Resource):
 
 
 api.add_resource(Users, "/users")
+api.add_resource(SignUp, "/signup")
 
 
 if __name__ == "__main__":

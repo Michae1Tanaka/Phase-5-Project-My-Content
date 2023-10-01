@@ -2,9 +2,6 @@
 
 # Standard library imports
 from random import randint, choice as rc
-import sys
-
-print(sys.path)
 
 # Remote library imports
 from faker import Faker
