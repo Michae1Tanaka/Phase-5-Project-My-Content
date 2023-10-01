@@ -77,15 +77,12 @@ if __name__ == "__main__":
                 created_at=fake.date_time_between(start_date="-2y", end_date="-1y"),
                 user_id=rc(user_ids),
             )
-            if x < 33:
+            if x < 50:
                 content.type = "Video"
                 content.url = rc(video_links)
-            elif 33 <= x < 66:
+            else:
                 content.type = "Article"
                 content.url = rc(articles_links)
-            else:
-                content.type = "Other"
-                content.url = fake.url()
 
             content_data.append(content)
 
