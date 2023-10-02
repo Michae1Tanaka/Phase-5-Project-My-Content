@@ -4,10 +4,34 @@ import HomeIcon from "@mui/icons-material/Home";
 import ArticleIcon from "@mui/icons-material/Article";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import { Link } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import Logout from "@mui/icons-material/Logout";
+import LoginIcon from "@mui/icons-material/Login";
+import { UserContext } from "../context/UserContextProvider";
+import { useContext } from "react";
 
 function Navbar() {
+  const { setUser, setErrors, user } = useContext(UserContext);
+  const navigate = useNavigate();
+  function handleLogOut() {
+    fetch("/logout", {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (res.ok) {
+          setUser(null);
+          navigate("/login");
+        } else {
+          console.error("Logout Failed");
+        }
+      })
+      .catch((err) => {
+        setErrors(err);
+      });
+  }
+
+  const isLogin = useMatch("/login");
+  const isSignUp = useMatch("signup");
   return (
     // Left side of Navbar
     <Box>
@@ -34,7 +58,15 @@ function Navbar() {
 
           {/* Right side of Navbar. */}
           <Button endIcon={<AccountBoxIcon />} component={Link} to="/profile" color="inherit"></Button>
-          <Button endIcon={<Logout />} component={Link} to="/login" color="inherit"></Button>
+          {isLogin || isSignUp ? null : user ? (
+            <Button endIcon={<Logout />} onClick={handleLogOut} color="inherit">
+              Log Out
+            </Button>
+          ) : (
+            <Button endIcon={<LoginIcon />} component={Link} to="/login" color="inherit">
+              Sign In
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
     </Box>

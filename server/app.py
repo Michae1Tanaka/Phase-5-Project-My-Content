@@ -40,6 +40,15 @@ def login():
             return jsonify({"message": "Invalid username or password"}), 401
 
 
+@app.route("/logout", methods=["DELETE"])
+def logout():
+    if session.get("user_id"):
+        session.clear()
+        return {}, 204
+    else:
+        return {"message": "Unauthorized Request"}, 401
+
+
 class CheckSession(Resource):
     def get(self):
         if session.get("user_id"):

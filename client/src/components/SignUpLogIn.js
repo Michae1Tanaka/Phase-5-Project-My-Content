@@ -15,14 +15,16 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate, useMatch } from "react-router-dom";
+import { UserContext } from "../context/UserContextProvider";
 
 const defaultTheme = createTheme();
+
 const SignInSchema = Yup.object().shape({
   username: Yup.string().required("Username is required."),
   password: Yup.string().required("Password is required."),
 });
 
-const signupSchema = Yup.object().shape({
+const signUpSchema = Yup.object().shape({
   username: Yup.string()
     .required("Username is required.")
     .min(3, "Usernames must be a minimum of 3 characters.")
@@ -30,11 +32,8 @@ const signupSchema = Yup.object().shape({
   password: Yup.string().required("Password is required.").min(8, "Passwords must be a minimum of 8 characters."),
 });
 
-export default function SignInLogIn() {
-  const [user, setUser] = React.useState(null);
-  const [errors, setErrors] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
-
+export default function SignUpLogIn() {
+  const { setUser, errors, setErrors, isLoading, setIsLoading } = React.useContext(UserContext);
   const navigate = useNavigate();
 
   const isLogin = useMatch("/login");
@@ -106,7 +105,7 @@ export default function SignInLogIn() {
               password: "",
               remember_me: false,
             }}
-            validationSchema={isLogin ? SignInSchema : signupSchema}
+            validationSchema={isLogin ? SignInSchema : signUpSchema}
             onSubmit={handleSubmit}
           >
             {({ isSubmitting }) => (
