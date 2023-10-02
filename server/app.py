@@ -91,9 +91,20 @@ class Videos(Resource):
             return {"message": "Unauthorized Request."}, 401
 
 
+class Articles(Resource):
+    def get(self):
+        user_id = session.get("user_id")
+        if user_id:
+            articles = Content.query.filter_by(user_id=user_id, type="Article").all()
+            return [article.to_dict() for article in articles], 200
+        else:
+            return {"message": "Unauthorized Request."}, 401
+
+
 api.add_resource(SignUp, "/signup")
 api.add_resource(CheckSession, "/check_session")
 api.add_resource(Videos, "/videos")
+api.add_resource(Articles, "/articles")
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
