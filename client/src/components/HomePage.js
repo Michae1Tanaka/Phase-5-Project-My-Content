@@ -1,11 +1,7 @@
-import React, { useContext } from "react";
-import { Container, Typography, Box, Button, Grid, Paper } from "@mui/material";
-import { Link } from "react-router-dom";
-import { UserContext } from "../context/UserContextProvider";
+import React from "react";
+import { Container, Typography, Box, Grid, Paper } from "@mui/material";
 
 function Home() {
-  const { user } = useContext(UserContext);
-  console.log(user);
   return (
     <Container component="main" maxWidth="md">
       {/* Header/Welcome Section */}

@@ -44,12 +44,12 @@ function Navbar() {
             startIcon={<ArticleIcon />}
             sx={{ marginRight: 0.25 }}
             component={Link}
-            to="/articles"
+            to={user ? "/articles" : "/login"}
             color="inherit"
           >
             Articles
           </Button>
-          <Button startIcon={<VideoLibraryIcon />} component={Link} to="/videos" color="inherit">
+          <Button startIcon={<VideoLibraryIcon />} component={Link} to={user ? "/videos" : "/login"} color="inherit">
             Videos
           </Button>
           {/* Space in Navbar */}
