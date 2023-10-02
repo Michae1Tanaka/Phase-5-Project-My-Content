@@ -32,7 +32,7 @@ const signUpSchema = Yup.object().shape({
   password: Yup.string().required("Password is required.").min(8, "Passwords must be a minimum of 8 characters."),
 });
 
-export default function SignUpLogIn() {
+function SignUpLogIn() {
   const { setUser, errors, setErrors, isLoading, setIsLoading } = React.useContext(UserContext);
   const navigate = useNavigate();
 
@@ -174,3 +174,5 @@ export default function SignUpLogIn() {
     </ThemeProvider>
   );
 }
+
+export default SignUpLogIn;

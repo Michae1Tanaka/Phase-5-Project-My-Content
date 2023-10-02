@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState } from "react";
 
 export const UserContext = createContext();
 
@@ -6,6 +6,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [errors, setErrors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [content, setContent] = useState([]);
 
   const value = {
     user,
@@ -14,6 +15,8 @@ export const UserProvider = ({ children }) => {
     setErrors,
     isLoading,
     setIsLoading,
+    content,
+    setContent,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
