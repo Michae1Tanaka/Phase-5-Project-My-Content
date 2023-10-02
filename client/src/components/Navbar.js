@@ -57,16 +57,18 @@ function Navbar() {
           <Box sx={{ flexGrow: 1 }} />
 
           {/* Right side of Navbar. */}
-          <Button endIcon={<AccountBoxIcon />} component={Link} to="/profile" color="inherit"></Button>
+          <Button
+            endIcon={<AccountBoxIcon />}
+            component={Link}
+            to={user ? "/profile" : "/login"}
+            color="inherit"
+          ></Button>
+          {/* If on /login or /signup no button is present. If there is no user logged in no button is present. If there is a user logged in log out button appears */}
           {isLogin || isSignUp ? null : user ? (
             <Button endIcon={<Logout />} onClick={handleLogOut} color="inherit">
               Log Out
             </Button>
-          ) : (
-            <Button endIcon={<LoginIcon />} component={Link} to="/login" color="inherit">
-              Sign In
-            </Button>
-          )}
+          ) : null}
         </Toolbar>
       </AppBar>
     </Box>

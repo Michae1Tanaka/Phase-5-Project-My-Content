@@ -3,10 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignUpLogIn from "./SignUpLogIn";
 import HomePage from "./HomePage";
 import Navbar from "./Navbar";
+import Articles from "./Articles";
 import { UserProvider, UserContext } from "../context/UserContextProvider";
 
 function App() {
-  const { user, setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
 
   useEffect(() => {
     fetch("/check_session").then((r) => {
@@ -24,6 +25,7 @@ function App() {
         <Route exact path="/" Component={HomePage} />
         <Route path="/login" Component={SignUpLogIn} />
         <Route path="/signup" Component={SignUpLogIn} />
+        <Route path="/articles" Component={Articles} />
       </Routes>
     </Router>
   );
