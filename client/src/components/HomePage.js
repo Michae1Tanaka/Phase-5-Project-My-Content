@@ -55,7 +55,7 @@ function Home() {
         </Grid>
       </Box>
 
-      {/* Updates/Coming Soon Section */}
+      {/* New Feature Requests section */}
       <Paper elevation={3} sx={{ p: 4, my: 4 }}>
         <Typography variant="h4" component="h3" gutterBottom>
           New Feature Requests!

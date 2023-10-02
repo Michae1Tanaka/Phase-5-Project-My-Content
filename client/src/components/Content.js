@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Paper, Typography, Container, Card, CardContent, Grid, CardMedia, Box } from "@mui/material";
+import { Typography, Container, Card, CardContent, Grid, CardMedia, Box } from "@mui/material";
 import { UserContext } from "../context/UserContextProvider";
 import { useMatch } from "react-router-dom";
 

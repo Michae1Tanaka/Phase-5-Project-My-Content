@@ -51,10 +51,11 @@ def logout():
 
 class CheckSession(Resource):
     def get(self):
-        if session.get("user_id"):
+        user_id = session.get("user_id")
+        if user_id:
             user = User.query.filter_by(id=session["user_id"]).first()
             return user.to_dict(), 200
-        elif not session["user_id"]:
+        elif not user_id:
             return {"message": "Unauthorized Request."}, 401
 
 
@@ -72,7 +73,7 @@ class SignUp(Resource):
         if not username or not data.get("password"):
             return {"message": "Username and password are required."}, 422
 
-        user = User(username=username, is_admin=False)
+        user = User(username=username)
 
         if len(data.get("password")) < 8:
             return {"message": "Passwords must be at least 8 characters."}
