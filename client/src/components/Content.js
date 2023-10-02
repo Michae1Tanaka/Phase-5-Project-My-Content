@@ -10,7 +10,7 @@ function Content() {
 
   // fetch for videos
   useEffect(() => {
-    const fetchVideos = async () => {
+    const fetchContent = async () => {
       try {
         const res = await fetch(endpoint);
         const contentData = await res.json();
@@ -19,7 +19,7 @@ function Content() {
         console.error(err);
       }
     };
-    fetchVideos();
+    fetchContent();
   }, [endpoint]);
 
   const contentMap = content.map((content) => {
@@ -28,11 +28,16 @@ function Content() {
         <a href={content.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
           <Card>
             <Grid container>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 {/* Thumbnail Side */}
-                <CardMedia component="img" image={content.thumbnail} alt={content.title} sx={{ aspectRatio: "16/9" }} />
+                <CardMedia
+                  component="img"
+                  image={content.thumbnail}
+                  alt={content.title}
+                  sx={{ width: "100%", objectFit: "cover", height: "200px" }}
+                />
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={6}>
                 {/* Details Side */}
                 <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
                   <Typography variant="h5" component="div">
