@@ -95,7 +95,9 @@ function Navbar() {
             </Tooltip>
           ) : (
             <Tooltip title="Log Out">
-              <Button endIcon={<Logout />} color="inherit" disabled />
+              <span>
+                <Button endIcon={<Logout />} color="inherit" disabled />
+              </span>
             </Tooltip>
           )}
         </Toolbar>

@@ -4,20 +4,26 @@ import SignUpLogIn from "./SignUpLogIn";
 import HomePage from "./HomePage";
 import Navbar from "./Navbar";
 import ArticlesOrVideos from "./Content";
+import Profile from "./Profile";
 import { UserProvider, UserContext } from "../context/UserContextProvider";
 
 function App() {
-  const { setUser } = useContext(UserContext);
-
+  const { setUser, setIsLoading } = useContext(UserContext);
   useEffect(() => {
-    fetch("/check_session").then((r) => {
-      if (r.ok) {
-        r.json().then((user) => {
-          setUser(user);
-        });
+    const fetchUser = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch("/check_session");
+        const userData = await res.json();
+        setUser(userData);
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
       }
-    });
-  }, [setUser]);
+    };
+    fetchUser();
+  }, []);
+
   return (
     <Router>
       <Navbar />
@@ -27,6 +33,7 @@ function App() {
         <Route path="/signup" Component={SignUpLogIn} />
         <Route path="/articles" Component={ArticlesOrVideos} />
         <Route path="/videos" Component={ArticlesOrVideos} />
+        <Route path="/profile" Component={Profile} />
       </Routes>
     </Router>
   );

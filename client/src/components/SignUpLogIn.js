@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Formik, Field, Form } from "formik";
-import * as Yup from "yup";
+import { string, object } from "yup";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -19,17 +19,17 @@ import { UserContext } from "../context/UserContextProvider";
 
 const defaultTheme = createTheme();
 
-const SignInSchema = Yup.object().shape({
-  username: Yup.string().required("Username is required."),
-  password: Yup.string().required("Password is required."),
+const SignInSchema = object().shape({
+  username: string().required("Username is required."),
+  password: string().required("Password is required."),
 });
 
-const signUpSchema = Yup.object().shape({
-  username: Yup.string()
+const signUpSchema = object().shape({
+  username: string()
     .required("Username is required.")
     .min(3, "Usernames must be a minimum of 3 characters.")
     .max(15, "Usernames cannot be more than 15 characters."),
-  password: Yup.string().required("Password is required.").min(8, "Passwords must be a minimum of 8 characters."),
+  password: string().required("Password is required.").min(8, "Passwords must be a minimum of 8 characters."),
 });
 
 function SignUpLogIn() {

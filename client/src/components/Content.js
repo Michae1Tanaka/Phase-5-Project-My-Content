@@ -8,7 +8,6 @@ function Content() {
   const isVideo = useMatch("/videos");
   const endpoint = isVideo ? "/videos" : "/articles";
 
-  // fetch for videos
   useEffect(() => {
     const fetchContent = async () => {
       try {

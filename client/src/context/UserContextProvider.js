@@ -7,7 +7,6 @@ export const UserProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState([]);
-
   const value = {
     user,
     setUser,
