@@ -4,7 +4,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import ArticleIcon from "@mui/icons-material/Article";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import { Link, useLocation, useMatch, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logout from "@mui/icons-material/Logout";
 import Tooltip from "@mui/material/Tooltip";
 import { UserContext } from "../context/UserContextProvider";
@@ -15,9 +15,6 @@ function Navbar() {
   const navigate = useNavigate();
 
   const location = useLocation();
-
-  const isLogin = useMatch("/login");
-  const isSignUp = useMatch("/signup");
 
   function handleLogOut() {
     fetch("/logout", {
