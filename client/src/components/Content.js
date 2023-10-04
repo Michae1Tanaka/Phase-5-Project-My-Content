@@ -2,6 +2,8 @@ import React, { useContext, useEffect } from "react";
 import { Typography, Container, Card, CardContent, Grid, CardMedia, Box } from "@mui/material";
 import { UserContext } from "../context/UserContextProvider";
 import { useMatch } from "react-router-dom";
+import NoContent from "./NoContent";
+import { boolean } from "yup";
 
 function Content() {
   const { content, setContent } = useContext(UserContext);
@@ -64,12 +66,14 @@ function Content() {
       </Grid>
     );
   });
-  return (
+  return content.length > 0 ? (
     <Container component="main" maxWidth="md" sx={{ mt: 10 }}>
       <Grid container spacing={4}>
         {contentMap}
       </Grid>
     </Container>
+  ) : (
+    <NoContent />
   );
 }
 
