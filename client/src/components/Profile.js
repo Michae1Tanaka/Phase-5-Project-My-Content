@@ -68,7 +68,14 @@ function Profile() {
                 <Box mt={2}>
                   <Typography>
                     <strong>Username:</strong>{" "}
-                    {user ? <Field name="username" type="text" placeholder={isLoading ? "" : user.username} /> : null}
+                    {user ? (
+                      <Field
+                        name="username"
+                        autoComplete="off"
+                        type="text"
+                        placeholder={isLoading ? "" : user.username}
+                      />
+                    ) : null}
                   </Typography>
                   <Typography>
                     <strong>Password:</strong> <Field name="password" type="password" placeholder="******" />
