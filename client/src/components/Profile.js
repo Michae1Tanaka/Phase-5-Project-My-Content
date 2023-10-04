@@ -42,7 +42,7 @@ function Profile() {
         const data = await res.json();
         setDeleteDialogOpen(false);
         setUser(null);
-        navigate("/signup");
+        navigate("/login");
       } else {
         const errorData = await res.json();
         console.error("Error while deleting account.", errorData.message);
@@ -98,7 +98,8 @@ function Profile() {
         <DialogTitle id="alert-dialog-title">Delete Account</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete your account? This action cannot be undone.
+            Are you sure you want to delete your account? This action cannot be undone. Your account and all content
+            saved will be deleted.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

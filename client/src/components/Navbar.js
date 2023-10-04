@@ -1,20 +1,20 @@
-import React from "react";
+import React, { useContext } from "react";
 import { AppBar, Toolbar, Button, Box, Typography } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import ArticleIcon from "@mui/icons-material/Article";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useMatch } from "react-router-dom";
 import Logout from "@mui/icons-material/Logout";
 import Tooltip from "@mui/material/Tooltip";
 import { UserContext } from "../context/UserContextProvider";
-import { useContext } from "react";
 
 function Navbar() {
   const { setUser, setErrors, user } = useContext(UserContext);
   const navigate = useNavigate();
 
   const location = useLocation();
+  const isSignup = useMatch("/signup");
 
   function handleLogOut() {
     fetch("/logout", {
@@ -54,7 +54,7 @@ function Navbar() {
   return (
     // Left side of Navbar
     <Box>
-      <AppBar position="static">
+      <AppBar position="static" color={isSignup ? "secondary" : "primary"}>
         <Toolbar>
           <Tooltip title="Home">
             <Button startIcon={<HomeIcon />} sx={{ marginRight: 0.25 }} component={Link} to="/" color="inherit" />
