@@ -39,7 +39,7 @@ function SignUpLogIn() {
   const isLogin = useMatch("/login");
 
   const handleSubmit = (values, { setSubmitting }) => {
-    const endpoint = isLogin ? "/login" : "/signup";
+    const endpoint = isLogin ? "/login" : "/account";
 
     setIsLoading(true);
 

@@ -59,7 +59,7 @@ class CheckSession(Resource):
             return {"message": "Unauthorized Request."}, 401
 
 
-class SignUp(Resource):
+class UserAccount(Resource):
     def post(self):
         data = request.get_json()
         usernames = [user.username for user in User.query.all()]
@@ -80,15 +80,29 @@ class SignUp(Resource):
 
         user.password_hash = data.get("password")
 
-        session["user_id]"] = user.id
+        db.session.add(user)
+        db.session.commit()
+
+        session["user_id"] = user.id
         if remember_me:
             session.permanent = True
         else:
             session.permanent = False
 
-        db.session.add(user)
-        db.session.commit()
         return user.to_dict(), 201
+
+    def delete(self):
+        user_id = session.get("user_id")
+        if user_id:
+            user = User.query.filter_by(id=user_id).first()
+            if user:
+                db.session.delete(user)
+                db.session.commit()
+                return ({},)
+            else:
+                return {"message": "User not found"}, 404
+        else:
+            return {"message": "Unauthorized Request."}, 401
 
 
 class Videos(Resource):
@@ -111,7 +125,7 @@ class Articles(Resource):
             return {"message": "Unauthorized Request."}, 401
 
 
-api.add_resource(SignUp, "/signup")
+api.add_resource(UserAccount, "/account")
 api.add_resource(CheckSession, "/check_session")
 api.add_resource(Videos, "/videos")
 api.add_resource(Articles, "/articles")

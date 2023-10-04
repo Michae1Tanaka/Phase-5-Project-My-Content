@@ -88,7 +88,7 @@ function Navbar() {
           <Tooltip title="Profile">
             <Button endIcon={<AccountBoxIcon />} component={Link} to={user ? "/profile" : "/login"} color="inherit" />
           </Tooltip>
-          {/* If on /login or /signup no button is present. If there is no user logged in no button is present. If there is a user logged in log out button appears */}
+          {/* If there is no user logged in the Log Out button is disabled. For title spacing issues when no button is present.*/}
           {user ? (
             <Tooltip title="Log Out">
               <Button endIcon={<Logout />} onClick={handleLogOut} color="inherit" />

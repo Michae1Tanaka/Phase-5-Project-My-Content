@@ -11,12 +11,13 @@ function App() {
   const { setUser, setIsLoading } = useContext(UserContext);
   useEffect(() => {
     const fetchUser = async () => {
-      setIsLoading(true);
       try {
         const res = await fetch("/check_session");
         const userData = await res.json();
-        setUser(userData);
-        setIsLoading(false);
+        if (res.ok) {
+          setUser(userData);
+          setIsLoading(false);
+        }
       } catch (err) {
         console.error(err);
       }
