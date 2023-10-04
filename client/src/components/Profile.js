@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Typography,
@@ -17,9 +18,11 @@ import { Formik, Form, Field } from "formik";
 import { string, object } from "yup";
 
 function Profile() {
-  const { user, isLoading } = useContext(UserContext);
+  const { user, isLoading, setUser } = useContext(UserContext);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const updateProfileSchema = object().shape({
     username: string()
@@ -28,6 +31,26 @@ function Profile() {
       .max(15, "Usernames cannot be more than 15 characters."),
     password: string().required("Password is required.").min(8, "Passwords must be a minimum of 8 characters."),
   });
+
+  async function handleDeleteAccount() {
+    try {
+      const res = await fetch("/account", {
+        method: "DELETE",
+      });
+      console.log(res);
+      if (res.ok) {
+        const data = await res.json();
+        setDeleteDialogOpen(false);
+        setUser(null);
+        navigate("/signup");
+      } else {
+        const errorData = await res.json();
+        console.error("Error while deleting account.", errorData.message);
+      }
+    } catch (err) {
+      console.error("Error: ", err);
+    }
+  }
 
   return (
     <Container component="main" sx={{ mt: 10 }}>
@@ -82,7 +105,7 @@ function Profile() {
           <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button /*onClick={handleDeleteAccount}*/ color="primary" autoFocus>
+          <Button onClick={handleDeleteAccount} color="primary" autoFocus>
             Confirm Delete
           </Button>
         </DialogActions>

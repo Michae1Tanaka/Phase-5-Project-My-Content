@@ -15,7 +15,9 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String, unique=True, nullable=False)
     _password_hash = db.Column(db.String)
 
-    content = db.relationship("Content", backref="user", lazy="dynamic")
+    content = db.relationship(
+        "Content", backref="user", lazy="dynamic", cascade="all,delete-orphan"
+    )
 
     @hybrid_property
     def password_hash(self):

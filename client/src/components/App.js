@@ -19,7 +19,7 @@ function App() {
           setIsLoading(false);
         }
       } catch (err) {
-        console.error(err);
+        console.error("No user was found");
       }
     };
     fetchUser();
