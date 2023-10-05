@@ -104,6 +104,31 @@ class UserAccount(Resource):
         else:
             return {"message": "Unauthorized Request."}, 401
 
+    def patch(self):
+        user_id = session.get("user_id")
+        user_to_update = User.query.filter_by(id=user_id).first()
+        updated_data = request.get_json()
+        username = updated_data.get("username", "")
+        password = updated_data.get("password", "")
+        usernames = [user.username for user in User.query.all()]
+        if not user_to_update:
+            return {"message": "User Not Found"}, 404
+        if (
+            username
+            and username != user_to_update.username
+            and username not in usernames
+        ):
+            user_to_update.username = username
+        else:
+            return {"message": "That username is already taken."}
+        if password and len(password) >= 8:
+            user_to_update.password_hash = password
+        else:
+            return {"message": "Passwords must be at least 8 characters."}
+        db.session.commit()
+
+        return user_to_update.to_dict()
+
 
 class Videos(Resource):
     def get(self):
