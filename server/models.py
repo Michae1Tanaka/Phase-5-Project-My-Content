@@ -5,6 +5,12 @@ from sqlalchemy.orm import validates
 
 from config import db, bcrypt
 
+content_tags = db.Table(
+    "content_tags",
+    db.Column("content_id", db.Integer, db.ForeignKey("content.id"), primary_key=True),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tags.id"), primary_key=True),
+)
+
 
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
@@ -64,3 +70,14 @@ class Content(db.Model, SerializerMixin):
     type = db.Column(db.String, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    tags = db.relationship(
+        "Tag", secondary=content_tags, backref="content", lazy="dynamic"
+    )
+
+
+class Tag(db.Model, SerializerMixin):
+    __tablename__ = "tags"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False, unique=True)
