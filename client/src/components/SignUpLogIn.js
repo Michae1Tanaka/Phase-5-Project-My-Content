@@ -48,7 +48,7 @@ function SignUpLogIn() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(values, null, 2),
+      body: JSON.stringify(values),
     }).then((r) => {
       setIsLoading(false);
       if (r.ok) {

@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Snackbar,
 } from "@mui/material";
 import { UserContext } from "../context/UserContextProvider";
 import { Formik, Form, Field } from "formik";
@@ -19,6 +20,8 @@ import { string, object } from "yup";
 
 function Profile() {
   const { user, isLoading, setUser } = useContext(UserContext);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -32,12 +35,35 @@ function Profile() {
     password: string().required("Password is required.").min(8, "Passwords must be a minimum of 8 characters."),
   });
 
+  async function handleUpdateAccount(values, formikBag) {
+    try {
+      const res = await fetch("/account", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      if (res.ok) {
+        const updatedUser = await res.json();
+        setUser(updatedUser);
+        formikBag.resetForm();
+        setSnackbarMessage("Username and/or password have been successfully updated.");
+        setSnackbarOpen(true);
+      } else {
+        const errorData = await res.json();
+        console.error("Error while updating account", errorData.message);
+      }
+    } catch (err) {
+      console.error("Error: ", err);
+    }
+  }
+
   async function handleDeleteAccount() {
     try {
       const res = await fetch("/account", {
         method: "DELETE",
       });
-      console.log(res);
       if (res.ok) {
         const data = await res.json();
         setDeleteDialogOpen(false);
@@ -62,38 +88,40 @@ function Profile() {
               password: "",
             }}
             validationSchema={updateProfileSchema}
+            onSubmit={(values, formikBag) => handleUpdateAccount(values, formikBag)}
           >
-            {() => (
-              <Form>
-                <Box mt={2}>
-                  <Typography>
-                    <strong>Username:</strong>{" "}
-                    {user ? (
-                      <Field
-                        name="username"
-                        autoComplete="off"
-                        type="text"
-                        placeholder={isLoading ? "" : user.username}
-                      />
-                    ) : null}
-                  </Typography>
-                  <Typography>
-                    <strong>Password:</strong> <Field name="password" type="password" placeholder="******" />
-                  </Typography>
+            {({ submitForm }) => (
+              <>
+                <Form>
+                  <Box mt={2}>
+                    <Typography>
+                      <strong>Username:</strong>{" "}
+                      {user ? (
+                        <Field
+                          name="username"
+                          autoComplete="off"
+                          type="text"
+                          placeholder={isLoading ? "" : user.username}
+                        />
+                      ) : null}
+                    </Typography>
+                    <Typography>
+                      <strong>Password:</strong> <Field name="password" type="password" placeholder="******" />
+                    </Typography>
+                  </Box>
+                  <Box mt={2}></Box>
+                </Form>
+                <Box mt={2} display="flex" justifyContent="space-between">
+                  <Button variant="contained" color="primary" onClick={submitForm}>
+                    Save
+                  </Button>
+                  <Button variant="contained" color="primary" onClick={() => setDeleteDialogOpen(true)}>
+                    Delete Account
+                  </Button>
                 </Box>
-                <Box mt={2}></Box>
-              </Form>
+              </>
             )}
           </Formik>
-
-          <Box mt={2} display="flex" justifyContent="space-between">
-            <Button variant="contained" color="primary" type="submit">
-              Save
-            </Button>
-            <Button variant="contained" color="primary" onClick={() => setDeleteDialogOpen(true)}>
-              Delete Account
-            </Button>
-          </Box>
         </CardContent>
       </Card>
       <Dialog

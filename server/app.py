@@ -76,7 +76,7 @@ class UserAccount(Resource):
         user = User(username=username)
 
         if len(data.get("password")) < 8:
-            return {"message": "Passwords must be at least 8 characters."}
+            return {"message": "Passwords must be at least 8 characters."}, 400
 
         user.password_hash = data.get("password")
 
@@ -120,14 +120,15 @@ class UserAccount(Resource):
         ):
             user_to_update.username = username
         else:
-            return {"message": "That username is already taken."}
+            return {"message": "That username is already taken."}, 409
         if password and len(password) >= 8:
             user_to_update.password_hash = password
         else:
-            return {"message": "Passwords must be at least 8 characters."}
+            return ({"message": "Passwords must be at least 8 characters."},), 400
+        db.session.add(user_to_update)
         db.session.commit()
 
-        return user_to_update.to_dict()
+        return user_to_update.to_dict(), 200
 
 
 class Videos(Resource):
