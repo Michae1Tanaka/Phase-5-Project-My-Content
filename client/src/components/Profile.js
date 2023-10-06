@@ -12,7 +12,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Snackbar,
 } from "@mui/material";
 import { UserContext } from "../context/UserContextProvider";
 import { Formik, Form, Field } from "formik";
@@ -20,8 +19,6 @@ import { string, object } from "yup";
 
 function Profile() {
   const { user, isLoading, setUser } = useContext(UserContext);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -48,8 +45,6 @@ function Profile() {
         const updatedUser = await res.json();
         setUser(updatedUser);
         formikBag.resetForm();
-        setSnackbarMessage("Username and/or password have been successfully updated.");
-        setSnackbarOpen(true);
       } else {
         const errorData = await res.json();
         console.error("Error while updating account", errorData.message);

@@ -151,10 +151,45 @@ class Articles(Resource):
             return {"message": "Unauthorized Request."}, 401
 
 
+class UserContent(Resource):
+    def post(self):
+        user = User.query.filter_by(id=session.get("user_id")).first()
+        if not user:
+            return {"message": "User not found."}, 404
+        content_data = request.get_json()
+        mandatory_fields = ["title", "thumbnail", "description", "url", "type"]
+        for field in mandatory_fields:
+            if field not in content_data:
+                return {"message": f"Missing field: {field}"}, 400
+
+        new_content = Content(
+            creator=content_data.get("creator"),
+            title=content_data["title"],
+            thumbnail=content_data["thumbnail"],
+            description=content_data["description"],
+            uploaded_at=db.func.now(),
+            created_at=content_data.get("created_at", db.func.now()),
+            url=content_data["url"],
+            type=content_data["type"],
+            user_id=user.id,
+        )
+
+        try:
+            db.session.add(new_content)
+            db.session.commit()
+            return new_content.to_dict(), 201
+        except Exception:
+            db.session.rollback()
+            return {
+                "message": "Failed to create content. Please try again later.",
+                "error": str(Exception),
+            }, 500
+
+
 api.add_resource(UserAccount, "/account")
 api.add_resource(CheckSession, "/check_session")
 api.add_resource(Videos, "/videos")
 api.add_resource(Articles, "/articles")
-
+api.add_resource(UserContent, "/content")
 if __name__ == "__main__":
     app.run(port=5555, debug=True)

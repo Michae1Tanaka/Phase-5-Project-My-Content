@@ -3,7 +3,6 @@ import { Typography, Container, Card, CardContent, Grid, CardMedia, Box } from "
 import { UserContext } from "../context/UserContextProvider";
 import { useMatch } from "react-router-dom";
 import NoContent from "./NoContent";
-import { boolean } from "yup";
 
 function Content() {
   const { content, setContent } = useContext(UserContext);
