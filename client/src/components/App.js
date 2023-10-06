@@ -5,6 +5,7 @@ import HomePage from "./HomePage";
 import Navbar from "./Navbar";
 import ArticlesOrVideos from "./Content";
 import Profile from "./Profile";
+import AddContent from "./AddContent";
 import { UserProvider, UserContext } from "../context/UserContextProvider";
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Route path="/articles" Component={ArticlesOrVideos} />
         <Route path="/videos" Component={ArticlesOrVideos} />
         <Route path="/profile" Component={Profile} />
+        <Route path="/add-content" Component={AddContent} />
       </Routes>
     </Router>
   );
