@@ -8,13 +8,14 @@ from faker import Faker
 
 # Local imports
 from app import app
-from models import db, User, Content
+from models import db, User, Content, Tag, content_tags
 
 if __name__ == "__main__":
     with app.app_context():
         print("Deleting all records...")
         User.query.delete()
         Content.query.delete()
+        Tag.query.delete()
 
         fake = Faker()
 
@@ -41,7 +42,7 @@ if __name__ == "__main__":
         db.session.add_all(users)
 
         db.session.commit()
-        print("Users Completed")
+        print("Users Completed!")
 
         print("Creating Content...")
 
@@ -89,3 +90,38 @@ if __name__ == "__main__":
         db.session.add_all(content_data)
         db.session.commit()
         print("Content Created!")
+
+        print("Creating Tags...")
+        TAGS = [
+            "Python",
+            "Javascript",
+            "React",
+            "SQL",
+            "SQLite",
+            "SQLAlchemy",
+            "Family",
+            "Fun",
+            "Educational",
+            "Video Games",
+            "Cars",
+            "Experiment",
+        ]
+        tags = []
+        for tag in TAGS:
+            new_tag = Tag(name=tag)
+            tags.append(new_tag)
+
+        db.session.add_all(tags)
+        db.session.commit()
+
+        print("Tags Completed!")
+
+        for content in content_data:
+            available_tags = list(Tag.query.all())
+            number_of_tags = randint(1, 5)
+
+            for _ in range(number_of_tags):
+                tag = rc(available_tags)
+                content.tags.append(tag)
+
+        db.session.commit()
