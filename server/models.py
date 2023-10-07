@@ -4,6 +4,12 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates
 
 from config import db, bcrypt
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_ARTICLE_IMAGE = os.path.join(BASE_DIR, "../client/public/default-article.jpg")
+DEFAULT_VIDEO_IMAGE = os.path.join(BASE_DIR, "../client/public/default-video.jpg")
+
 
 content_tags = db.Table(
     "content_tags",
@@ -18,7 +24,7 @@ class User(db.Model, SerializerMixin):
     serialize_rules = ("-password_hash", "-_password_hash", "-content")
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, nullable=False)
+    username = db.Column(db.String(24), unique=True, nullable=False)
     _password_hash = db.Column(db.String)
 
     content = db.relationship(
@@ -43,15 +49,14 @@ class User(db.Model, SerializerMixin):
 
     @validates("username")
     def validates_username(self, key, username):
+        if not 3 <= len(username) <= 24:
+            raise ValueError("Username must be between and 24 characters.")
         if not username:
             raise ValueError("You must input a username.")
         user_check = User.query.filter_by(username=username).first()
         if user_check:
             raise ValueError(f"This username is already in use.")
         return username
-
-    def __repr__(self):
-        return f"Username: {self.username}"
 
 
 class Content(db.Model, SerializerMixin):
@@ -60,12 +65,12 @@ class Content(db.Model, SerializerMixin):
     serialize_rules = ("-user_id",)
 
     id = db.Column(db.Integer, primary_key=True)
-    creator = db.Column(db.String, nullable=False, server_default="Unknown")
-    title = db.Column(db.String, nullable=False)
-    thumbnail = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=False)
+    creator = db.Column(db.String(24), nullable=False, server_default="Unknown")
+    title = db.Column(db.String(64), nullable=False)
+    _thumbnail = db.Column("thumbnail", db.String)
+    description = db.Column(db.String(64), nullable=False)
     uploaded_at = db.Column(db.DateTime, server_default=db.func.now())
-    created_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, nullable=True)
     url = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=False)
 
@@ -75,6 +80,51 @@ class Content(db.Model, SerializerMixin):
         "Tag", secondary=content_tags, backref="content", lazy="dynamic"
     )
 
+    @validates("title")
+    def validate_title(self, key, title):
+        if not 3 <= len(title) <= 64:
+            raise ValueError("Title must be between 3 and 64 characters.")
+        return title
+
+    @validates("creator")
+    def validate_creator(self, key, creator):
+        if not 5 <= len(creator) <= 24:
+            raise ValueError("Creator must be between 5 and 24 characters.")
+        return creator
+
+    @validates("type")
+    def validate_type(self, key, content_type):
+        if content_type not in ["Video", "Article"]:
+            raise ValueError('Type must be either "Video" or "Article".')
+        return content_type
+
+    @validates("description")
+    def validate_description(self, key, description):  # Fixed typo in function name
+        if not description:
+            raise ValueError("Description is required.")
+        if not 16 <= len(description) <= 64:
+            raise ValueError("Descriptions must be between 16 and 64 characters.")
+        return description
+
+    @hybrid_property
+    def thumbnail(self):
+        return self._thumbnail
+
+    @thumbnail.setter
+    def thumbnail(self, thumbnail):
+        if not thumbnail:
+            if self.type == "Video":
+                self._thumbnail = DEFAULT_VIDEO_IMAGE
+            elif self.type == "Article":
+                self._thumbnail = DEFAULT_ARTICLE_IMAGE
+        else:
+            self._thumbnail = thumbnail
+
+    def __repr__(self):
+        return (
+            f"<Content(id={self.id}, title='{self.title}', creator='{self.creator}')>"
+        )
+
 
 class Tag(db.Model, SerializerMixin):
     __tablename__ = "tags"
@@ -82,4 +132,13 @@ class Tag(db.Model, SerializerMixin):
     serialize_rules = ("-content",)
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
+    name = db.Column(db.String(16), nullable=False, unique=True)
+
+    @validates("name")
+    def validate_name(self, key, name):
+        if not 1 <= len(name) <= 16:
+            raise ValueError("Tag name must be between 1 and 16 characters.")
+        return name
+
+    def __repr__(self):
+        return f"<Tag(id={self.id}, name='{self.name}')>"
