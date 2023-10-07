@@ -79,5 +79,7 @@ class Content(db.Model, SerializerMixin):
 class Tag(db.Model, SerializerMixin):
     __tablename__ = "tags"
 
+    serialize_rules = ("-content",)
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
