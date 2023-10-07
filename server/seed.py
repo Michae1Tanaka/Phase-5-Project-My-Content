@@ -25,15 +25,18 @@ if __name__ == "__main__":
         usernames = []
 
         for _ in range(10):
-            username = fake.first_name() + "user"
+            username = fake.first_name()[:23]
             while not username or username in usernames:
-                username = fake.first_name() + "user"
-
+                username = fake.first_name()[:23]
             usernames.append(username)
-
             user = User(username=username)
-            user.password_hash = username + "password"
-
+            user.password_hash = fake.password(
+                length=8,
+                special_chars=False,
+                upper_case=False,
+                lower_case=True,
+                digits=True,
+            )
             users.append(user)
         test_user = User(username="potatoes")
         test_user.password_hash = "potatoes"
@@ -69,21 +72,44 @@ if __name__ == "__main__":
         content_data = []
 
         for x in range(100):
+            title = fake.sentence()[:64]
+            creator = (
+                fake.first_name()
+                + " "
+                + fake.last_name()[: 23 - len(fake.first_name()) - 1]
+            )
+            description = fake.sentence(nb_words=10)
+            while not 16 <= len(description) <= 64:
+                description = fake.sentence(nb_words=10)
+
+            if x <= 45:
+                content_type = "Video"
+                url = rc(video_links)
+                default_thumbnail = fake.image_url()
+            elif 46 <= x <= 50:
+                content_type = "Video"
+                url = rc(video_links)
+                default_thumbnail = None
+            elif 51 <= x <= 95:
+                content_type = "Article"
+                url = rc(articles_links)
+                default_thumbnail = fake.image_url()
+            else:
+                content_type = "Article"
+                url = rc(articles_links)
+                default_thumbnail = None
+
             content = Content(
-                title=fake.sentence(),
-                creator=fake.name(),
-                thumbnail=fake.image_url(),
-                description=fake.sentence(),
+                title=title,
+                creator=creator,
+                description=description,
                 uploaded_at=fake.date_time_between(start_date="-1y", end_date="now"),
                 created_at=fake.date_time_between(start_date="-2y", end_date="-1y"),
                 user_id=rc(user_ids),
+                type=content_type,
+                thumbnail=default_thumbnail,
+                url=url,
             )
-            if x < 50:
-                content.type = "Video"
-                content.url = rc(video_links)
-            else:
-                content.type = "Article"
-                content.url = rc(articles_links)
 
             content_data.append(content)
 
@@ -118,10 +144,8 @@ if __name__ == "__main__":
 
         for content in content_data:
             available_tags = list(Tag.query.all())
-            number_of_tags = randint(1, 5)
-
-            for _ in range(number_of_tags):
-                tag = rc(available_tags)
+            tag = rc(available_tags)
+            if tag not in content.tags:
                 content.tags.append(tag)
 
         db.session.commit()

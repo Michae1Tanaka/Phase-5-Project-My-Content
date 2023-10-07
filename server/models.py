@@ -4,11 +4,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates
 
 from config import db, bcrypt
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_ARTICLE_IMAGE = os.path.join(BASE_DIR, "../client/public/default-article.jpg")
-DEFAULT_VIDEO_IMAGE = os.path.join(BASE_DIR, "../client/public/default-video.jpg")
 
 
 content_tags = db.Table(
@@ -114,9 +109,9 @@ class Content(db.Model, SerializerMixin):
     def thumbnail(self, thumbnail):
         if not thumbnail:
             if self.type == "Video":
-                self._thumbnail = DEFAULT_VIDEO_IMAGE
+                self._thumbnail = "https://www.keytechinc.com/wp-content/uploads/2022/01/video-thumbnail.jpg"
             elif self.type == "Article":
-                self._thumbnail = DEFAULT_ARTICLE_IMAGE
+                self._thumbnail = "https://www.intl-spectrum.com/articles/r75/ArticleDefault.jpg?x=528x372"
         else:
             self._thumbnail = thumbnail
 

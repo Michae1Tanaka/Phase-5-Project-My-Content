@@ -32,7 +32,7 @@ function Content() {
                 {/* Thumbnail Side */}
                 <CardMedia
                   component="img"
-                  image={content.thumbnail}
+                  image={content._thumbnail}
                   alt={content.title}
                   sx={{ width: "100%", objectFit: "cover", height: "200px" }}
                 />
