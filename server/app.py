@@ -6,13 +6,14 @@
 from flask import request, session, make_response, jsonify
 from flask_restful import Resource
 from datetime import datetime
+from sqlalchemy import and_
 
 # Local imports
 from config import app, db, api
 
 
 # Add your model imports
-from models import User, Content
+from models import User, Content, Tag
 
 
 # Helpers
@@ -264,10 +265,25 @@ class UserContent(Resource):
             }, 500
 
 
+class TagSearch(Resource):
+    def get(self, tag_name):
+        if not tag_name:
+            tags = Tag.query.all()
+            return {"tags": [tag.name for tag in tags]}, 200
+        tag = Tag.query.filter_by(name=tag_name).first()
+        if not tag:
+            return {"message": "Tag not found."}, 404
+
+        content = tag.content.all()
+        return {"content": [cont.to_dict() for cont in content]}, 200
+
+
 api.add_resource(UserAccount, "/account")
 api.add_resource(CheckSession, "/check_session")
 api.add_resource(Videos, "/videos")
 api.add_resource(Articles, "/articles")
 api.add_resource(UserContent, "/add_content")
+api.add_resource(TagSearch, "/tags", "/tags/<string:tag_name>")
+
 if __name__ == "__main__":
     app.run(port=5555, debug=True)

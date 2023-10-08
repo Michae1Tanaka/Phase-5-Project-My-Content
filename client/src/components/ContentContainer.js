@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContextProvider";
 import { useMatch } from "react-router-dom";
 import Content from "./Content";
+import TagSearchBar from "./TagSearchBar";
+import { Grid, Button } from "@mui/material";
 
 function ContentContainer() {
   const { content, setContent } = useContext(UserContext);
@@ -81,16 +83,20 @@ function ContentContainer() {
   };
 
   return (
-    <Content
-      content={content}
-      isEditDialogOpen={isEditDialogOpen}
-      editContentData={editContentData}
-      handleDelete={handleDelete}
-      handleEditSubmit={handleEditSubmit}
-      setEditDialogOpen={setEditDialogOpen}
-      setEditContentData={setEditContentData}
-      isVideo={isVideo}
-    />
+    <Grid container spacing={2} alignItems="center">
+      <Grid item xs={7}>
+        {content.length > 0 ? <TagSearchBar isVideo={isVideo} /> : null}
+      </Grid>
+      <Content
+        content={content}
+        isEditDialogOpen={isEditDialogOpen}
+        editContentData={editContentData}
+        handleDelete={handleDelete}
+        handleEditSubmit={handleEditSubmit}
+        setEditDialogOpen={setEditDialogOpen}
+        setEditContentData={setEditContentData}
+      />
+    </Grid>
   );
 }
 
