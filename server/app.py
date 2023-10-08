@@ -42,7 +42,7 @@ def login():
             return jsonify({"message": "Invalid username or password"}), 401
 
 
-@app.route("/logout", methods=["DELETE"])
+@app.route("/logout", methods=["DELETE", "PATCH"])
 def logout():
     if session.get("user_id"):
         session.clear()
@@ -51,23 +51,32 @@ def logout():
         return {"message": "Unauthorized Request"}, 401
 
 
-@app.route("/videos/<int:video_id>", methods=["DELETE"])
+@app.route("/videos/<int:video_id>", methods=["DELETE", "PATCH"])
 def delete_video(video_id):
     user_id = session.get("user_id")
     if not user_id:
         return {"message": "Unauthorized Request"}, 401
     if not video_id:
-        return {"message": "Video ID not provided."}
+        return {"message": "Video ID not provided."}, 400
 
-    video_to_delete = Content.query.filter_by(id=video_id).first()
-    if not video_to_delete or video_to_delete.user_id != user_id:
-        return {"message": "No video found or unauthorized access."}
+    targeted_video = Content.query.filter_by(id=video_id).first()
 
-    db.session.delete(video_to_delete)
+    if not targeted_video or targeted_video.user_id != user_id:
+        return {"message": "No video found or unauthorized access."}, 403
 
-    db.session.commit()
+    if request.method == "DELETE":
+        db.session.delete(targeted_video)
+        db.session.commit()
 
-    return {"message": "Video Deleted"}, 200
+        return {"message": "Video Deleted"}, 200
+
+    elif request.method == "PATCH":
+        new_content_data = request.get_json()
+        for key, value in new_content_data.items():
+            if value:
+                setattr(targeted_video, key, value)
+        db.session.commit()
+        return {"message": "Video Updated"}, 200
 
 
 @app.route("/articles/<int:article_id>", methods=["DELETE"])

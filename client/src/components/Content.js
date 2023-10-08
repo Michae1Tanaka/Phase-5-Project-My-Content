@@ -1,5 +1,26 @@
-import React, { useContext, useEffect } from "react";
-import { Tooltip, Button, Typography, Container, Card, CardContent, Grid, CardMedia, Box } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  DialogActions,
+  DialogTitle,
+  DialogContent,
+  Paper,
+  Dialog,
+  TextField,
+  Tooltip,
+  Button,
+  Typography,
+  Container,
+  Card,
+  CardContent,
+  Grid,
+  CardMedia,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { Formik, Field, Form } from "formik";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { UserContext } from "../context/UserContextProvider";
@@ -10,7 +31,16 @@ function Content() {
   const { content, setContent } = useContext(UserContext);
   const isVideo = useMatch("/videos");
   const endpoint = isVideo ? "/videos" : "/articles";
-
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [editContentData, setEditContentData] = useState({
+    title: "",
+    description: "",
+    _thumbnail: "",
+    url: "",
+    _creator: "",
+    created_at: null,
+    type: "",
+  });
   useEffect(() => {
     const fetchContent = async () => {
       try {
@@ -43,6 +73,31 @@ function Content() {
     }
   };
 
+  const handleEditSubmit = async (e, updatedContentData) => {
+    console.log(updatedContentData.id);
+
+    try {
+      const res = await fetch(`${endpoint}/${editContentData.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedContentData),
+      });
+      if (res.ok) {
+        const updatedContents = content.map((item) => {
+          if (item.id === editContentData.id) {
+            return { ...item, ...updatedContentData };
+          }
+          return item;
+        });
+        setContent(updatedContents);
+        setEditDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to edit content: ", error);
+    }
+  };
   const contentMap = content.map((content) => {
     return (
       <Grid item xs={12} key={content.id}>
@@ -103,7 +158,14 @@ function Content() {
                     }}
                   >
                     <Tooltip title="Edit">
-                      <Button aria-label="edit">
+                      <Button
+                        aria-label="edit"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setEditDialogOpen(true);
+                          setEditContentData(content);
+                        }}
+                      >
                         <EditIcon />
                       </Button>
                     </Tooltip>
@@ -126,6 +188,142 @@ function Content() {
       <Grid container spacing={4}>
         {contentMap}
       </Grid>
+      <Dialog
+        open={isEditDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setEditContentData({
+            title: "",
+            description: "",
+            _thumbnail: "",
+            url: "",
+            _creator: "",
+            created_at: null,
+            type: "",
+          });
+        }}
+        aria-labelledby="edit-content-dialog-title"
+        PaperComponent={Paper}
+      >
+        <DialogTitle id="edit-content-dialog-title">Edit Content</DialogTitle>
+        <Formik initialValues={editContentData} onSubmit={handleEditSubmit}>
+          {({ isSubmitting, setFieldValue }) => (
+            <Form>
+              <DialogContent>
+                <Field name="_creator">
+                  {({ field, meta }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      margin="normal"
+                      label="Creator"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      error={meta.touched && !!meta.error}
+                      helperText={meta.touched && meta.error}
+                    />
+                  )}
+                </Field>
+                <Field name="title">
+                  {({ field, meta }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      margin="normal"
+                      label="Title"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      error={meta.touched && !!meta.error}
+                      helperText={meta.touched && meta.error}
+                    />
+                  )}
+                </Field>
+                <Field name="description">
+                  {({ field, meta }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      margin="normal"
+                      label="Description"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      error={meta.touched && !!meta.error}
+                      helperText={meta.touched && meta.error}
+                    />
+                  )}
+                </Field>
+                <Field name="url">
+                  {({ field, meta }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      margin="normal"
+                      label="Video Url"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      error={meta.touched && !!meta.error}
+                      helperText={meta.touched && meta.error}
+                    />
+                  )}
+                </Field>
+                <Field name="_thumbnail">
+                  {({ field, meta }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      margin="normal"
+                      label="Thumbnail"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      error={meta.touched && !!meta.error}
+                      helperText={meta.touched && meta.error}
+                    />
+                  )}
+                </Field>
+                <Field name="created_at">
+                  {({ field, meta }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      margin="normal"
+                      type="datetime-local"
+                      label="Created At"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      error={meta.touched && !!meta.error}
+                      helperText={meta.touched && meta.error}
+                      onChange={(e) => {
+                        setFieldValue("created_at", e.target.value);
+                      }}
+                    />
+                  )}
+                </Field>
+                <Field name="type">
+                  {({ field, meta }) => (
+                    <FormControl fullWidth margin="normal">
+                      <InputLabel>Type</InputLabel>
+                      <Select {...field}>
+                        <MenuItem value="">Select Type</MenuItem>
+                        <MenuItem value="Video">Video</MenuItem>
+                        <MenuItem value="Article">Article</MenuItem>
+                      </Select>
+                      {meta.touched && meta.error && <div className="error">{meta.error}</div>}
+                    </FormControl>
+                  )}
+                </Field>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setEditDialogOpen(false)} color="primary">
+                  Close
+                </Button>
+                <Button type="submit" color="primary" disabled={isSubmitting}>
+                  Submit
+                </Button>
+              </DialogActions>
+            </Form>
+          )}
+        </Formik>
+      </Dialog>
     </Container>
   ) : (
     <NoContent />
