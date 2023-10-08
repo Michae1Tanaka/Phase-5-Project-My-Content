@@ -13,7 +13,7 @@ from config import app, db, api
 
 
 # Add your model imports
-from models import User, Content, Tag
+from models import User, Content, Tag, content_tags
 
 
 # Helpers
@@ -266,16 +266,31 @@ class UserContent(Resource):
 
 
 class TagSearch(Resource):
-    def get(self, tag_name):
+    def get(self, tag_name, endpoint):
+        user_id = session.get("user_id")
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            return {"message": "Unauthorized Request"}, 401
         if not tag_name:
             tags = Tag.query.all()
-            return {"tags": [tag.name for tag in tags]}, 200
+            return [tag.to_dict() for tag in tags], 201
         tag = Tag.query.filter_by(name=tag_name).first()
         if not tag:
-            return {"message": "Tag not found."}, 404
+            return {"message": "Tag not found"}, 404
 
-        content = tag.content.all()
-        return {"content": [cont.to_dict() for cont in content]}, 200
+        content = (
+            db.session.query(Content)
+            .join(content_tags, Content.id == content_tags.c.content_id)
+            .join(Tag, content_tags.c.tag_id == Tag.id)
+            .filter(
+                Tag.name == tag_name,
+                Content.user_id == user_id,
+                Content.type == endpoint,
+            )
+            .all()
+        )
+        if len(content) != 0:
+            return [cont.to_dict() for cont in content], 201
 
 
 api.add_resource(UserAccount, "/account")
@@ -283,7 +298,7 @@ api.add_resource(CheckSession, "/check_session")
 api.add_resource(Videos, "/videos")
 api.add_resource(Articles, "/articles")
 api.add_resource(UserContent, "/add_content")
-api.add_resource(TagSearch, "/tags", "/tags/<string:tag_name>")
+api.add_resource(TagSearch, "/tags", "/tags/<string:tag_name>/<string:endpoint>")
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)

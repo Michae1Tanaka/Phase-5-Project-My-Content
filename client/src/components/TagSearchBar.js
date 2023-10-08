@@ -8,8 +8,9 @@ import { useNavigate } from "react-router-dom";
 
 function TagSearchBar({ isVideo }) {
   const [tags, setTags] = useState([]);
-  const { content, setContent } = useContext(UserContext);
+  const { setContent } = useContext(UserContext);
   const navigate = useNavigate();
+  const endpoint = isVideo ? "Video" : "Article";
 
   const handleAddTag = (tag) => {
     if (!tags.includes(tag)) {
@@ -21,6 +22,20 @@ function TagSearchBar({ isVideo }) {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
+  const fetchContentByTag = async (tag) => {
+    try {
+      const res = await fetch(`/tags/${tag}/${endpoint}`);
+      const data = await res.json();
+      if (data) {
+        setContent(data);
+      } else {
+        setContent([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch content by tag: ", error);
+    }
+  };
+
   return (
     <Box sx={{ p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 1 }}>
       <Formik
@@ -29,6 +44,7 @@ function TagSearchBar({ isVideo }) {
           handleAddTag(values.tag);
           resetForm();
           setSubmitting(false);
+          fetchContentByTag(values.tag);
         }}
       >
         <Form>
