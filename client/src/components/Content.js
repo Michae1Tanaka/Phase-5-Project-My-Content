@@ -36,88 +36,94 @@ function Content(props) {
     setEditContentData,
   } = props;
 
+  function formatTags(tags) {
+    return tags.map((tag) => tag.name).join(", ");
+  }
+
   const contentMap = content.map((content) => {
     return (
       <Grid item xs={12} key={content.id}>
-        <a href={content.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-          <Card>
-            <Grid container>
-              <Grid item xs={4}>
-                {/* Thumbnail Side */}
-                <CardMedia
-                  component="img"
-                  image={content._thumbnail}
-                  alt={content.title}
-                  sx={{ width: "100%", objectFit: "cover", height: "200px", borderRadius: "8px 0 0 8px" }}
-                />
-              </Grid>
-              <Grid item xs={8}>
-                {/* Details Side */}
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
-                    padding: "16px",
-                  }}
-                >
-                  <Typography variant="h6" component="div" gutterBottom textAlign={"center"}>
-                    {content.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ flex: "1 1 1", marginBottom: "8px" }}>
-                    {content.description}
-                  </Typography>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    <Typography variant="caption" color="text.secondary">
-                      Uploaded at: {content.uploaded_at ? content.uploaded_at.slice(0, 10) : "Unknown"}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {content.created_at ? `Created at ${content.created_at.slice(0, 10)}` : ""}
-                    </Typography>
-                  </div>
-                  <Typography variant="subtitle1" component="div">
-                    Creator: {content._creator ? content._creator : "Unknown"}
-                  </Typography>
-                  {/* Edit and Delete Buttons */}
-                  <Box
+        <Tooltip title={formatTags(content.tags)}>
+          <a href={content.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+            <Card>
+              <Grid container>
+                <Grid item xs={4}>
+                  {/* Thumbnail Side */}
+                  <CardMedia
+                    component="img"
+                    image={content._thumbnail}
+                    alt={content.title}
+                    sx={{ width: "100%", objectFit: "cover", height: "200px", borderRadius: "8px 0 0 8px" }}
+                  />
+                </Grid>
+                <Grid item xs={8}>
+                  {/* Details Side */}
+                  <CardContent
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-end",
-                      mt: "20px",
-                      width: "100%",
+                      flexDirection: "column",
+                      height: "100%",
+                      padding: "16px",
                     }}
                   >
-                    <Tooltip title="Edit">
-                      <Button
-                        aria-label="edit"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setEditDialogOpen(true);
-                          setEditContentData(content);
-                        }}
-                      >
-                        <EditIcon />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <Button aria-label="delete" onClick={(event) => handleDelete(event, content.id)}>
-                        <DeleteIcon />
-                      </Button>
-                    </Tooltip>
-                  </Box>
-                </CardContent>
+                    <Typography variant="h6" component="div" gutterBottom textAlign={"center"}>
+                      {content.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ flex: "1 1 1", marginBottom: "8px" }}>
+                      {content.description}
+                    </Typography>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        Uploaded at: {content.uploaded_at ? content.uploaded_at.slice(0, 10) : "Unknown"}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {content.created_at ? `Created at ${content.created_at.slice(0, 10)}` : ""}
+                      </Typography>
+                    </div>
+                    <Typography variant="subtitle1" component="div">
+                      Creator: {content._creator ? content._creator : "Unknown"}
+                    </Typography>
+                    {/* Edit and Delete Buttons */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-end",
+                        mt: "20px",
+                        width: "100%",
+                      }}
+                    >
+                      <Tooltip title="Edit">
+                        <Button
+                          aria-label="edit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setEditDialogOpen(true);
+                            setEditContentData(content);
+                          }}
+                        >
+                          <EditIcon />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <Button aria-label="delete" onClick={(event) => handleDelete(event, content.id)}>
+                          <DeleteIcon />
+                        </Button>
+                      </Tooltip>
+                    </Box>
+                  </CardContent>
+                </Grid>
               </Grid>
-            </Grid>
-          </Card>
-        </a>
+            </Card>
+          </a>
+        </Tooltip>
       </Grid>
     );
   });
