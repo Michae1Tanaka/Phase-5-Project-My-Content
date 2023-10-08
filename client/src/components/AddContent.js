@@ -61,8 +61,12 @@ function AddContent() {
       });
       if (response.ok) {
         const newContent = await response.json();
-        setContent(...content, newContent);
-        navigate("/");
+        setContent([...content, newContent]);
+        if (newContent.type === "Video") {
+          navigate("/videos");
+        } else {
+          navigate("/articles");
+        }
       } else {
         const err = await response.json();
         console.error(err);

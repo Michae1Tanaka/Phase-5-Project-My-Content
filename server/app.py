@@ -142,6 +142,24 @@ class Videos(Resource):
         else:
             return {"message": "Unauthorized Request."}, 401
 
+    def delete(self):
+        user_id = session.get("user_id")
+        if not user_id:
+            return {"message": "Unauthorized Request"}, 401
+        video_id = request.get_json().get("videoId")
+        if not video_id:
+            return {"message": "Video ID not provided."}
+
+        video_to_delete = Content.query.filter_by(id=video_id).first()
+        if not video_to_delete or video_to_delete.user_id != user_id:
+            return {"message": "No video found or unauthorized access."}
+
+        db.session.delete(video_to_delete)
+
+        db.session.commit()
+
+        return {"message": "Video Deleted"}, 200
+
 
 class Articles(Resource):
     def get(self):
@@ -161,7 +179,7 @@ class UserContent(Resource):
 
         content_data = request.get_json()
 
-        # I wont lie i used chatgpt for this because I was dying trying to figure this out. deduct points if you have to. I understand.
+        # I won't lie i used chatgpt for this because I was dying trying to figure this out. deduct points if you have to. I understand.
         created_at_str = content_data.get("created_at")
 
         if created_at_str:
