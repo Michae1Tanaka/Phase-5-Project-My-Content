@@ -41,6 +41,7 @@ function Content() {
     created_at: null,
     type: "",
   });
+
   useEffect(() => {
     const fetchContent = async () => {
       try {
@@ -73,24 +74,28 @@ function Content() {
     }
   };
 
-  const handleEditSubmit = async (e, updatedContentData) => {
-    console.log(updatedContentData.id);
-
+  const handleEditSubmit = async (values) => {
     try {
       const res = await fetch(`${endpoint}/${editContentData.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedContentData),
+        body: JSON.stringify(values),
       });
       if (res.ok) {
-        const updatedContents = content.map((item) => {
-          if (item.id === editContentData.id) {
-            return { ...item, ...updatedContentData };
+        let updatedContents = [...content];
+
+        const index = updatedContents.findIndex((item) => item.id === editContentData.id);
+
+        if (index !== -1) {
+          if (values.type !== updatedContents[index].type) {
+            updatedContents.splice(index, 1);
+          } else {
+            updatedContents[index] = { ...updatedContents[index], ...values };
           }
-          return item;
-        });
+        }
+
         setContent(updatedContents);
         setEditDialogOpen(false);
       }
@@ -138,7 +143,7 @@ function Content() {
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
-                      Uploaded at: {content.uploaded_at.slice(0, 10)}
+                      Uploaded at: {content.uploaded_at ? content.uploaded_at.slice(0, 10) : "Unknown"}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Created at: {content.created_at ? content.created_at.slice(0, 10) : "Unknown"}
@@ -206,7 +211,7 @@ function Content() {
         PaperComponent={Paper}
       >
         <DialogTitle id="edit-content-dialog-title">Edit Content</DialogTitle>
-        <Formik initialValues={editContentData} onSubmit={handleEditSubmit}>
+        <Formik initialValues={editContentData} onSubmit={handleEditSubmit} enableReinitialize>
           {({ isSubmitting, setFieldValue }) => (
             <Form>
               <DialogContent>

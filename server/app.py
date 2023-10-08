@@ -72,9 +72,34 @@ def delete_video(video_id):
 
     elif request.method == "PATCH":
         new_content_data = request.get_json()
-        for key, value in new_content_data.items():
-            if value:
-                setattr(targeted_video, key, value)
+        print(new_content_data)
+        if "title" in new_content_data:
+            targeted_video.title = new_content_data["title"]
+        if "_thumbnail" in new_content_data:
+            targeted_video._thumbnail = new_content_data["_thumbnail"]
+        if "_creator" in new_content_data:
+            targeted_video._creator = new_content_data["_creator"]
+        if "url" in new_content_data:
+            targeted_video.url = new_content_data["url"]
+        if "thumbnail" in new_content_data:
+            targeted_video.thumbnail = new_content_data["thumbnail"]
+        if "type" in new_content_data:
+            targeted_video.type = new_content_data["type"]
+        if "created_at" in new_content_data:
+            created_at_str = new_content_data.get("created_at")
+
+            if created_at_str:
+                try:
+                    created_at_date = datetime.strptime(
+                        created_at_str, "%Y-%m-%d"
+                    ).date()
+                    created_at = datetime.combine(created_at_date, datetime.min.time())
+                except ValueError as e:
+                    print(f"Error parsing date: {e}")
+                    created_at = None
+            else:
+                created_at = None
+            targeted_video.created_at = created_at
         db.session.commit()
         return {"message": "Video Updated"}, 200
 
