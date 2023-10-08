@@ -11,6 +11,17 @@ function TagSearchBar({ isVideo }) {
   const { setContent } = useContext(UserContext);
   const navigate = useNavigate();
   const endpoint = isVideo ? "Video" : "Article";
+  const fetchEndpoint = isVideo ? "/videos" : "/articles";
+
+  const fetchOriginalContent = async () => {
+    try {
+      const res = await fetch(fetchEndpoint);
+      const data = await res.json();
+      setContent(data);
+    } catch (error) {
+      console.error("Failed to fetch original content: ", error);
+    }
+  };
 
   const handleAddTag = (tag) => {
     if (!tags.includes(tag)) {
@@ -19,9 +30,12 @@ function TagSearchBar({ isVideo }) {
   };
 
   const handleRemoveTag = (tagToRemove) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
+    const newTags = tags.filter((tag) => tag !== tagToRemove);
+    setTags(newTags);
+    if (newTags.length === 0) {
+      fetchOriginalContent();
+    }
   };
-
   const fetchContentByTag = async (tag) => {
     try {
       const res = await fetch(`/tags/${tag}/${endpoint}`);
