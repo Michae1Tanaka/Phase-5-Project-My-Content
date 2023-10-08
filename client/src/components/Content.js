@@ -3,6 +3,12 @@ import { Typography, Container, Card, CardContent, Grid, CardMedia, Box } from "
 import { UserContext } from "../context/UserContextProvider";
 import { useMatch } from "react-router-dom";
 import NoContent from "./NoContent";
+import { styled } from "@mui/material/styles";
+
+const StyledCard = styled(Card)({
+  borderRadius: "8px",
+  boxShadow: "0px 4px 6px rba(0,0,0,0.1)",
+});
 
 function Content() {
   const { content, setContent } = useContext(UserContext);
@@ -26,41 +32,43 @@ function Content() {
     return (
       <Grid item xs={12} key={content.id}>
         <a href={content.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-          <Card>
+          <StyledCard>
             <Grid container>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 {/* Thumbnail Side */}
                 <CardMedia
                   component="img"
                   image={content._thumbnail}
                   alt={content.title}
-                  sx={{ width: "100%", objectFit: "cover", height: "200px" }}
+                  sx={{ width: "100%", objectFit: "cover", height: "200px", borderRadius: "8px 0 0 8px" }}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={8}>
                 {/* Details Side */}
-                <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                  <Typography variant="h5" component="div">
+                <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%", padding: "16px" }}>
+                  <Typography variant="h6" component="div" gutterBottom>
                     {content.title}
                   </Typography>
-                  <Typography variant="subtitle2" color="text.secondary" sx={{ flex: "1 1 1" }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ flex: "1 1 1", marginBottom: "8px" }}>
                     {content.description}
                   </Typography>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}
+                  >
                     <Typography variant="caption" color="text.secondary">
                       Uploaded at: {content.uploaded_at.slice(0, 10)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Created at: {content.created_at ? content.created_at : "Unknown"}
                     </Typography>
-                  </div>
-                  <Typography variant="subtitle1" component="div">
-                    Creator: {content.creator ? content.creator : "Unknown"}
+                  </Box>
+                  <Typography variant="subtitle2" component="div">
+                    {content.creator ? content.creator : "Unknown"}
                   </Typography>
                 </CardContent>
               </Grid>
             </Grid>
-          </Card>
+          </StyledCard>
         </a>
       </Grid>
     );
