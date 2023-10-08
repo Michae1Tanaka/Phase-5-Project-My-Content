@@ -4,9 +4,11 @@ import { Select, MenuItem, Button, TextField, Grid, Container, Tooltip, IconButt
 import InfoIcon from "@mui/icons-material/Info";
 import { UserContext } from "../context/UserContextProvider";
 import { string, object, date } from "yup";
+import { useNavigate } from "react-router-dom";
 
 function AddContent() {
   const { content, setContent } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const initialValues = {
     creator: "",
@@ -39,7 +41,7 @@ function AddContent() {
     thumbnail: string().url(),
     description: string()
       .required("Description is required.")
-      .min(16, "Description must be more than 17 characters.")
+      .min(16, "Description must be more than 15 characters.")
       .max(64, "Description must be less than 65 characters."),
     created_at: date(),
     url: string().required("URL is required.").url(),
@@ -48,10 +50,31 @@ function AddContent() {
       .oneOf(["Video", "Article"], 'Type must be either "Video" or "Article".'),
   });
 
+  async function handleNewContentSubmit(values, { setSubmitting }) {
+    try {
+      const response = await fetch("/add_content", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      if (response.ok) {
+        const newContent = await response.json();
+        setContent(...content, newContent);
+        navigate("/");
+      } else {
+        const err = await response.json();
+        console.error(err);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  }
   return (
     <Container component="main" maxWidth="md" sx={{ mt: 10 }}>
-      <Formik initialValues={initialValues} validationSchema={createContentSchema}>
-        {({ isSubmitting, errors, touched }) => (
+      <Formik initialValues={initialValues} validationSchema={createContentSchema} onSubmit={handleNewContentSubmit}>
+        {({ isSubmitting }) => (
           <Form>
             <Grid container spacing={2}>
               {Object.keys(initialValues).map((key) => (
@@ -62,8 +85,8 @@ function AddContent() {
                         {key === "type" ? (
                           <Select {...field} fullWidth variant="outlined" displayEmpty>
                             <MenuItem value="">Type</MenuItem>
-                            <MenuItem value="video">Video</MenuItem>
-                            <MenuItem value="article">Article</MenuItem>
+                            <MenuItem value="Video">Video</MenuItem>
+                            <MenuItem value="Article">Article</MenuItem>
                           </Select>
                         ) : (
                           <TextField

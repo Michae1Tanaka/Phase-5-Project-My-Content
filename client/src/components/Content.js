@@ -48,14 +48,14 @@ function Content() {
                   </Typography>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <Typography variant="caption" color="text.secondary">
-                      Uploaded at: {content.uploaded_at}
+                      Uploaded at: {content.uploaded_at.slice(0, 10)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Created at: {content.created_at}
+                      Created at: {content.created_at ? content.created_at : "Unknown"}
                     </Typography>
                   </div>
                   <Typography variant="subtitle1" component="div">
-                    Creator: {content.creator}
+                    Creator: {content.creator ? content.creator : "Unknown"}
                   </Typography>
                 </CardContent>
               </Grid>

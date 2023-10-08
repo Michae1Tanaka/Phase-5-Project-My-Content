@@ -5,9 +5,11 @@
 # Remote library imports
 from flask import request, session, make_response, jsonify
 from flask_restful import Resource
+from datetime import datetime
 
 # Local imports
 from config import app, db, api
+
 
 # Add your model imports
 from models import User, Content
@@ -156,7 +158,22 @@ class UserContent(Resource):
         user = User.query.filter_by(id=session.get("user_id")).first()
         if not user:
             return {"message": "User not found."}, 404
+
         content_data = request.get_json()
+
+        # I wont lie i used chatgpt for this because I was dying trying to figure this out. deduct points if you have to. I understand.
+        created_at_str = content_data.get("created_at")
+
+        if created_at_str:
+            try:
+                created_at_date = datetime.strptime(created_at_str, "%Y-%m-%d").date()
+                created_at = datetime.combine(created_at_date, datetime.min.time())
+            except ValueError as e:
+                print(f"Error parsing date: {e}")
+                created_at = None
+        else:
+            created_at = None
+
         mandatory_fields = ["title", "description", "url", "type"]
         for field in mandatory_fields:
             if field not in content_data:
@@ -167,22 +184,22 @@ class UserContent(Resource):
             title=content_data["title"],
             description=content_data["description"],
             uploaded_at=db.func.now(),
-            created_at=content_data.get("created_at", db.func.now()),
+            created_at=created_at,
             url=content_data["url"],
             type=content_data["type"],
             thumbnail=content_data.get("thumbnail", None),
             user_id=user.id,
         )
-
         try:
             db.session.add(new_content)
+
             db.session.commit()
             return new_content.to_dict(), 201
-        except Exception:
+        except Exception as exc:
             db.session.rollback()
             return {
                 "message": "Failed to create content. Please try again later.",
-                "error": str(Exception),
+                "error": str(exc),
             }, 500
 
 

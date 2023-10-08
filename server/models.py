@@ -60,7 +60,9 @@ class Content(db.Model, SerializerMixin):
     serialize_rules = ("-user_id",)
 
     id = db.Column(db.Integer, primary_key=True)
-    creator = db.Column(db.String(24), nullable=False, server_default="Unknown")
+    _creator = db.Column(
+        "creator", db.String(24), nullable=False, server_default="Unknown"
+    )
     title = db.Column(db.String(64), nullable=False)
     _thumbnail = db.Column("thumbnail", db.String)
     description = db.Column(db.String(64), nullable=False)
@@ -81,12 +83,6 @@ class Content(db.Model, SerializerMixin):
             raise ValueError("Title must be between 3 and 64 characters.")
         return title
 
-    @validates("creator")
-    def validate_creator(self, key, creator):
-        if not 5 <= len(creator) <= 24:
-            raise ValueError("Creator must be between 5 and 24 characters.")
-        return creator
-
     @validates("type")
     def validate_type(self, key, content_type):
         if content_type not in ["Video", "Article"]:
@@ -100,6 +96,15 @@ class Content(db.Model, SerializerMixin):
         if not 16 <= len(description) <= 64:
             raise ValueError("Descriptions must be between 16 and 64 characters.")
         return description
+
+    @hybrid_property
+    def creator(self):
+        return self._creator
+
+    @creator.setter
+    def creator(self, creator):
+        if not creator:
+            self._creator = "Unknown"
 
     @hybrid_property
     def thumbnail(self):
@@ -116,9 +121,7 @@ class Content(db.Model, SerializerMixin):
             self._thumbnail = thumbnail
 
     def __repr__(self):
-        return (
-            f"<Content(id={self.id}, title='{self.title}', creator='{self.creator}')>"
-        )
+        return f"<Content(id={self.id}, title='{self.title}', creator='{self.creator}',description={self.description}, type={self.type},created_at = {self.created_at}, uploaded_at={self.uploaded_at})>"
 
 
 class Tag(db.Model, SerializerMixin):
