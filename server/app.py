@@ -79,23 +79,32 @@ def delete_video(video_id):
         return {"message": "Video Updated"}, 200
 
 
-@app.route("/articles/<int:article_id>", methods=["DELETE"])
+@app.route("/articles/<int:article_id>", methods=["DELETE", "PATCH"])
 def delete_article(article_id):
     user_id = session.get("user_id")
     if not user_id:
         return {"message": "Unauthorized Request"}, 401
     if not article_id:
-        return {"message": "Article ID not provided."}
+        return {"message": "Article ID not provided."}, 400
 
-    article_to_delete = Content.query.filter_by(id=article_id).first()
-    if not article_to_delete or article_to_delete.user_id != user_id:
-        return {"message": "No article found or unauthorized access."}
+    targeted_article = Content.query.filter_by(id=article_id).first()
 
-    db.session.delete(article_to_delete)
+    if not targeted_article or targeted_article.user_id != user_id:
+        return {"message": "No article found or unauthorized access."}, 403
 
-    db.session.commit()
+    if request.method == "DELETE":
+        db.session.delete(targeted_article)
+        db.session.commit()
 
-    return {"message": "Article Deleted"}, 200
+        return {"message": "articled Deleted"}, 200
+
+    elif request.method == "PATCH":
+        new_content_data = request.get_json()
+        for key, value in new_content_data.items():
+            if value:
+                setattr(targeted_article, key, value)
+        db.session.commit()
+        return {"message": "Article Updated"}, 200
 
 
 class CheckSession(Resource):
