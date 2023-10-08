@@ -78,7 +78,13 @@ function TagSearchBar({ isVideo }) {
               </Field>
             </Grid>
             <Grid item>
-              <Button variant="contained" color="primary" startIcon={<SearchIcon />} type="submit">
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<SearchIcon />}
+                type="submit"
+                disabled={tags.length > 0}
+              >
                 Search
               </Button>
             </Grid>
