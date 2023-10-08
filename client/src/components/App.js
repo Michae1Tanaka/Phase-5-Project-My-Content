@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignUpLogIn from "./SignUpLogIn";
 import HomePage from "./HomePage";
 import Navbar from "./Navbar";
-import ArticlesOrVideos from "./Content";
+import ContentContainer from "./ContentContainer";
 import Profile from "./Profile";
 import AddContent from "./AddContent";
 import { UserProvider, UserContext } from "../context/UserContextProvider";
@@ -33,8 +33,8 @@ function App() {
         <Route exact path="/" Component={HomePage} />
         <Route path="/login" Component={SignUpLogIn} />
         <Route path="/signup" Component={SignUpLogIn} />
-        <Route path="/articles" Component={ArticlesOrVideos} />
-        <Route path="/videos" Component={ArticlesOrVideos} />
+        <Route path="/articles" Component={ContentContainer} />
+        <Route path="/videos" Component={ContentContainer} />
         <Route path="/profile" Component={Profile} />
         <Route path="/add-content" Component={AddContent} />
       </Routes>

@@ -72,7 +72,6 @@ def delete_video(video_id):
 
     elif request.method == "PATCH":
         new_content_data = request.get_json()
-        print(new_content_data)
         if "title" in new_content_data:
             targeted_video.title = new_content_data["title"]
         if "_thumbnail" in new_content_data:

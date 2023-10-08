@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import {
   DialogActions,
   DialogTitle,
@@ -23,86 +23,19 @@ import {
 import { Formik, Field, Form } from "formik";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { UserContext } from "../context/UserContextProvider";
-import { useMatch } from "react-router-dom";
 import NoContent from "./NoContent";
 
-function Content() {
-  const { content, setContent } = useContext(UserContext);
-  const isVideo = useMatch("/videos");
-  const endpoint = isVideo ? "/videos" : "/articles";
-  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
-  const [editContentData, setEditContentData] = useState({
-    title: "",
-    description: "",
-    _thumbnail: "",
-    url: "",
-    _creator: "",
-    created_at: null,
-    type: "",
-  });
+function Content(props) {
+  const {
+    content,
+    isEditDialogOpen,
+    editContentData,
+    handleDelete,
+    handleEditSubmit,
+    setEditDialogOpen,
+    setEditContentData,
+  } = props;
 
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const res = await fetch(endpoint);
-        const contentData = await res.json();
-        setContent(contentData);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchContent();
-  }, [endpoint]);
-
-  const handleDelete = async (event, contentID) => {
-    event.preventDefault();
-
-    try {
-      const res = await fetch(`${endpoint}/${contentID}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        const newContent = content.filter((item) => item.id !== contentID);
-        setContent(newContent);
-      } else {
-        console.error("Failed to delete content");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-    }
-  };
-
-  const handleEditSubmit = async (values) => {
-    try {
-      const res = await fetch(`${endpoint}/${editContentData.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-      if (res.ok) {
-        let updatedContents = [...content];
-
-        const index = updatedContents.findIndex((item) => item.id === editContentData.id);
-
-        if (index !== -1) {
-          if (values.type !== updatedContents[index].type) {
-            updatedContents.splice(index, 1);
-          } else {
-            updatedContents[index] = { ...updatedContents[index], ...values };
-          }
-        }
-
-        setContent(updatedContents);
-        setEditDialogOpen(false);
-      }
-    } catch (error) {
-      console.error("Failed to edit content: ", error);
-    }
-  };
   const contentMap = content.map((content) => {
     return (
       <Grid item xs={12} key={content.id}>
@@ -188,6 +121,7 @@ function Content() {
       </Grid>
     );
   });
+
   return content.length > 0 ? (
     <Container component="main" maxWidth="md" sx={{ mt: 10, boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}>
       <Grid container spacing={4}>
