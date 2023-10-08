@@ -170,6 +170,24 @@ class Articles(Resource):
         else:
             return {"message": "Unauthorized Request."}, 401
 
+    def delete(self):
+        user_id = session.get("user_id")
+        if not user_id:
+            return {"message": "Unauthorized Request"}, 401
+        article_id = request.get_json().get("articleId")
+        if not article_id:
+            return {"message": "Article ID not provided."}
+
+        article_to_delete = Content.query.filter_by(id=article_id).first()
+        if not article_to_delete or article_to_delete.user_id != user_id:
+            return {"message": "No article found or unauthorized access."}
+
+        db.session.delete(article_to_delete)
+
+        db.session.commit()
+
+        return {"message": "Article Deleted"}, 200
+
 
 class UserContent(Resource):
     def post(self):
