@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Formik, Form, Field } from "formik";
 import { Select, MenuItem, Button, TextField, Grid, Container, Tooltip, IconButton } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import { UserContext } from "../context/UserContextProvider";
+import { string, object, date } from "yup";
 
 function AddContent() {
+  const { content, setContent } = useContext(UserContext);
+
   const initialValues = {
     creator: "",
     title: "",
@@ -15,7 +19,7 @@ function AddContent() {
   };
 
   const tooltips = {
-    creator: "The name of the content creator.",
+    creator: "The name of the content creator. If left blank the creator will be 'Unknown'.",
     title: "The title of the content.",
     thumbnail: "A link to the thumbnail image.",
     description: "A brief description of the content.",
@@ -24,71 +28,75 @@ function AddContent() {
     type: "The type of the content (Video or Article).",
   };
 
+  const createContentSchema = object().shape({
+    creator: string()
+      .min(5, "Username must be more than 4 characters.")
+      .max(24, "Username must be less than 25 characters."),
+    title: string()
+      .required("A title is required.")
+      .min(3, "Title must more than 2 characters.")
+      .max(64, "Title must be less than 65 characters."),
+    thumbnail: string().url(),
+    description: string()
+      .required("Description is required.")
+      .min(16, "Description must be more than 17 characters.")
+      .max(64, "Description must be less than 65 characters."),
+    created_at: date(),
+    url: string().required("URL is required.").url(),
+    type: string()
+      .required("Type is required.")
+      .oneOf(["Video", "Article"], 'Type must be either "Video" or "Article".'),
+  });
+
   return (
     <Container component="main" maxWidth="md" sx={{ mt: 10 }}>
-      <Formik initialValues={initialValues}>
-        <Form>
-          <Grid container spacing={2}>
-            {Object.keys(initialValues).map((key) => (
-              <Grid item xs={12} key={key}>
-                {key === "type" ? (
-                  <Field name="type" as={Select} fullWidth variant="outlined">
-                    <MenuItem value="">
-                      <em>Type</em>
-                    </MenuItem>
-                    <MenuItem value="video">Video</MenuItem>
-                    <MenuItem value="article">Article</MenuItem>
-                  </Field>
-                ) : key === "created_at" ? (
-                  <Field name="created_at">
-                    {({ field, meta }) => (
-                      <TextField
-                        {...field}
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        label={key.charAt(0).toUpperCase() + key.slice(1)}
-                        variant="outlined"
-                        InputProps={{
-                          endAdornment: (
-                            <Tooltip title={tooltips[key] || ""}>
-                              <IconButton aria-label="info">
-                                <InfoIcon />
-                              </IconButton>
-                            </Tooltip>
-                          ),
-                        }}
-                      />
-                    )}
-                  </Field>
-                ) : (
+      <Formik initialValues={initialValues} validationSchema={createContentSchema}>
+        {({ isSubmitting, errors, touched }) => (
+          <Form>
+            <Grid container spacing={2}>
+              {Object.keys(initialValues).map((key) => (
+                <Grid item xs={12} key={key}>
                   <Field name={key}>
                     {({ field, meta }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        label={key.charAt(0).toUpperCase() + key.slice(1)}
-                        variant="outlined"
-                        InputProps={{
-                          endAdornment: (
-                            <Tooltip title={tooltips[key] || ""}>
-                              <IconButton aria-label="info">
-                                <InfoIcon />
-                              </IconButton>
-                            </Tooltip>
-                          ),
-                        }}
-                      />
+                      <div>
+                        {key === "type" ? (
+                          <Select {...field} fullWidth variant="outlined" displayEmpty>
+                            <MenuItem value="">Type</MenuItem>
+                            <MenuItem value="video">Video</MenuItem>
+                            <MenuItem value="article">Article</MenuItem>
+                          </Select>
+                        ) : (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            type={key === "created_at" ? "date" : "text"}
+                            label={key.charAt(0).toUpperCase() + key.slice(1)}
+                            variant="outlined"
+                            error={meta.touched && !!meta.error}
+                            helperText={meta.touched && meta.error}
+                            InputProps={{
+                              endAdornment: (
+                                <Tooltip title={tooltips[key] || ""}>
+                                  <IconButton aria-label="info">
+                                    <InfoIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              ),
+                            }}
+                            InputLabelProps={key === "created_at" ? { shrink: true } : {}}
+                          />
+                        )}
+                      </div>
                     )}
                   </Field>
-                )}
-              </Grid>
-            ))}
-          </Grid>
-          <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-            Add Content
-          </Button>
-        </Form>
+                </Grid>
+              ))}
+            </Grid>
+            <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }} disabled={isSubmitting}>
+              Add Content
+            </Button>
+          </Form>
+        )}
       </Formik>
     </Container>
   );
