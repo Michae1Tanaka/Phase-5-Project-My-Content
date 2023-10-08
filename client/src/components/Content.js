@@ -1,5 +1,7 @@
 import React, { useContext, useEffect } from "react";
-import { Button, Typography, Container, Card, CardContent, Grid, CardMedia, Box } from "@mui/material";
+import { Tooltip, Button, Typography, Container, Card, CardContent, Grid, CardMedia, Box } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import { UserContext } from "../context/UserContextProvider";
 import { useMatch } from "react-router-dom";
 import NoContent from "./NoContent";
@@ -21,6 +23,25 @@ function Content() {
     };
     fetchContent();
   }, [endpoint]);
+
+  const handleDelete = async (event, contentID) => {
+    event.preventDefault();
+
+    try {
+      const res = await fetch(`${endpoint}/${contentID}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        const newContent = content.filter((item) => item.id !== contentID);
+        setContent(newContent);
+      } else {
+        console.error("Failed to delete content");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
 
   const contentMap = content.map((content) => {
     return (
@@ -65,12 +86,33 @@ function Content() {
                       Uploaded at: {content.uploaded_at.slice(0, 10)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Created at: {content.created_at ? content.created_at : "Unknown"}
+                      Created at: {content.created_at ? content.created_at.slice(0, 10) : "Unknown"}
                     </Typography>
                   </div>
                   <Typography variant="subtitle1" component="div">
                     Creator: {content.creator ? content.creator : "Unknown"}
                   </Typography>
+                  {/* Edit and Delete Buttons */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-end",
+                      mt: "20px",
+                      width: "100%",
+                    }}
+                  >
+                    <Tooltip title="Edit">
+                      <Button aria-label="edit">
+                        <EditIcon />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <Button aria-label="delete" onClick={(event) => handleDelete(event, content.id)}>
+                        <DeleteIcon />
+                      </Button>
+                    </Tooltip>
+                  </Box>
                 </CardContent>
               </Grid>
             </Grid>

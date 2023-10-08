@@ -51,6 +51,44 @@ def logout():
         return {"message": "Unauthorized Request"}, 401
 
 
+@app.route("/videos/<int:video_id>", methods=["DELETE"])
+def delete_video(video_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return {"message": "Unauthorized Request"}, 401
+    if not video_id:
+        return {"message": "Video ID not provided."}
+
+    video_to_delete = Content.query.filter_by(id=video_id).first()
+    if not video_to_delete or video_to_delete.user_id != user_id:
+        return {"message": "No video found or unauthorized access."}
+
+    db.session.delete(video_to_delete)
+
+    db.session.commit()
+
+    return {"message": "Video Deleted"}, 200
+
+
+@app.route("/articles/<int:article_id>", methods=["DELETE"])
+def delete_article(article_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return {"message": "Unauthorized Request"}, 401
+    if not article_id:
+        return {"message": "Article ID not provided."}
+
+    article_to_delete = Content.query.filter_by(id=article_id).first()
+    if not article_to_delete or article_to_delete.user_id != user_id:
+        return {"message": "No article found or unauthorized access."}
+
+    db.session.delete(article_to_delete)
+
+    db.session.commit()
+
+    return {"message": "Article Deleted"}, 200
+
+
 class CheckSession(Resource):
     def get(self):
         user_id = session.get("user_id")
@@ -142,24 +180,6 @@ class Videos(Resource):
         else:
             return {"message": "Unauthorized Request."}, 401
 
-    def delete(self):
-        user_id = session.get("user_id")
-        if not user_id:
-            return {"message": "Unauthorized Request"}, 401
-        video_id = request.get_json().get("videoId")
-        if not video_id:
-            return {"message": "Video ID not provided."}
-
-        video_to_delete = Content.query.filter_by(id=video_id).first()
-        if not video_to_delete or video_to_delete.user_id != user_id:
-            return {"message": "No video found or unauthorized access."}
-
-        db.session.delete(video_to_delete)
-
-        db.session.commit()
-
-        return {"message": "Video Deleted"}, 200
-
 
 class Articles(Resource):
     def get(self):
@@ -169,24 +189,6 @@ class Articles(Resource):
             return [article.to_dict() for article in articles], 200
         else:
             return {"message": "Unauthorized Request."}, 401
-
-    def delete(self):
-        user_id = session.get("user_id")
-        if not user_id:
-            return {"message": "Unauthorized Request"}, 401
-        article_id = request.get_json().get("articleId")
-        if not article_id:
-            return {"message": "Article ID not provided."}
-
-        article_to_delete = Content.query.filter_by(id=article_id).first()
-        if not article_to_delete or article_to_delete.user_id != user_id:
-            return {"message": "No article found or unauthorized access."}
-
-        db.session.delete(article_to_delete)
-
-        db.session.commit()
-
-        return {"message": "Article Deleted"}, 200
 
 
 class UserContent(Resource):
