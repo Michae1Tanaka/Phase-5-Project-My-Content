@@ -73,11 +73,7 @@ if __name__ == "__main__":
 
         for x in range(100):
             title = fake.sentence()[:64]
-            creator = (
-                fake.first_name()
-                + " "
-                + fake.last_name()[: 23 - len(fake.first_name()) - 1]
-            )
+            creator = fake.first_name()
             description = fake.sentence(nb_words=10)
             while not 16 <= len(description) <= 64:
                 description = fake.sentence(nb_words=10)
@@ -87,6 +83,7 @@ if __name__ == "__main__":
                 url = rc(video_links)
                 default_thumbnail = fake.image_url()
             elif 46 <= x <= 50:
+                creator = ""
                 content_type = "Video"
                 url = rc(video_links)
                 default_thumbnail = None

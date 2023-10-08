@@ -105,6 +105,8 @@ class Content(db.Model, SerializerMixin):
     def creator(self, creator):
         if not creator:
             self._creator = "Unknown"
+        else:
+            self._creator = creator
 
     @hybrid_property
     def thumbnail(self):

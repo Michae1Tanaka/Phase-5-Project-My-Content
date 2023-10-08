@@ -90,7 +90,7 @@ function Content() {
                     </Typography>
                   </div>
                   <Typography variant="subtitle1" component="div">
-                    Creator: {content.creator ? content.creator : "Unknown"}
+                    Creator: {content._creator ? content._creator : "Unknown"}
                   </Typography>
                   {/* Edit and Delete Buttons */}
                   <Box
