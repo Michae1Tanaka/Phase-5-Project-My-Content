@@ -51,7 +51,6 @@ function ContentContainer() {
   };
 
   const handleEditSubmit = async (values) => {
-    console.log(typeof values.created_at);
     try {
       const res = await fetch(`${endpoint}/${editContentData.id}`, {
         method: "PATCH",
@@ -90,6 +89,7 @@ function ContentContainer() {
       handleEditSubmit={handleEditSubmit}
       setEditDialogOpen={setEditDialogOpen}
       setEditContentData={setEditContentData}
+      isVideo={isVideo}
     />
   );
 }

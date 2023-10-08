@@ -23,9 +23,12 @@ import {
 import { Formik, Field, Form } from "formik";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import NoContent from "./NoContent";
+import { useNavigate } from "react-router-dom";
 
 function Content(props) {
+  const navigate = useNavigate();
   const {
     content,
     isEditDialogOpen,
@@ -34,6 +37,7 @@ function Content(props) {
     handleEditSubmit,
     setEditDialogOpen,
     setEditContentData,
+    isVideo,
   } = props;
 
   const contentMap = content.map((content) => {
@@ -124,6 +128,15 @@ function Content(props) {
 
   return content.length > 0 ? (
     <Container component="main" maxWidth="md" sx={{ mt: 10, boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}>
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<AddIcon />}
+        onClick={() => navigate("/add-content")}
+        sx={{ marginBottom: 2 }}
+      >
+        {isVideo ? "Add Video" : "Add Article"}
+      </Button>
       <Grid container spacing={4}>
         {contentMap}
       </Grid>
