@@ -79,7 +79,7 @@ function Content(props) {
                       Uploaded at: {content.uploaded_at ? content.uploaded_at.slice(0, 10) : "Unknown"}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Created at: {content.created_at ? content.created_at.slice(0, 10) : "Unknown"}
+                      {content.created_at ? `Created at ${content.created_at.slice(0, 10)}` : ""}
                     </Typography>
                   </div>
                   <Typography variant="subtitle1" component="div">
@@ -220,22 +220,26 @@ function Content(props) {
                   )}
                 </Field>
                 <Field name="created_at">
-                  {({ field, meta }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      margin="normal"
-                      type="datetime-local"
-                      label="Created At"
-                      variant="outlined"
-                      InputLabelProps={{ shrink: true }}
-                      error={meta.touched && !!meta.error}
-                      helperText={meta.touched && meta.error}
-                      onChange={(e) => {
-                        setFieldValue("created_at", e.target.value);
-                      }}
-                    />
-                  )}
+                  {({ field, meta }) => {
+                    const fieldValue = field.value ? field.value : "";
+                    return (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        value={fieldValue}
+                        margin="normal"
+                        type="datetime-local"
+                        label="Created At"
+                        variant="outlined"
+                        InputLabelProps={{ shrink: true }}
+                        error={meta.touched && !!meta.error}
+                        helperText={meta.touched && meta.error}
+                        onChange={(e) => {
+                          setFieldValue("created_at", e.target.value);
+                        }}
+                      />
+                    );
+                  }}
                 </Field>
                 <Field name="type">
                   {({ field, meta }) => (

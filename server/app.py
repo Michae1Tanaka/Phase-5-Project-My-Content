@@ -14,9 +14,59 @@ from config import app, db, api
 # Add your model imports
 from models import User, Content
 
-# Views go here!
+
+# Helpers
+def get_targeted_content(content_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return None, {"message": "Unauthorized Request"}, 401
+    if not content_id:
+        return None, {"message": "Content ID not provided."}, 400
+
+    targeted_content = Content.query.filter_by(id=content_id).first()
+
+    if not targeted_content or targeted_content.user_id != user_id:
+        return None, {"message": "No content found or unauthorized access."}, 403
+
+    return targeted_content, None, None
 
 
+def update_content_from_data(targeted_content, new_content_data):
+    fields = ["title", "_thumbnail", "_creator", "url", "thumbnail", "type"]
+    for field in fields:
+        if field in new_content_data:
+            setattr(targeted_content, field, new_content_data[field] or None)
+
+    if "created_at" in new_content_data:
+        created_at_str = new_content_data.get("created_at")
+        if created_at_str:
+            try:
+                created_at = datetime.strptime(created_at_str, "%Y-%m-%dT%H:%M")
+                targeted_content.created_at = created_at
+            except ValueError as e:
+                print(f"Error parsing date: {e}")
+        else:
+            targeted_content.created_at = None
+
+
+def handle_content(content_id, content_type):
+    targeted_content, error_message, error_code = get_targeted_content(content_id)
+    if error_message:
+        return error_message, error_code
+
+    if request.method == "DELETE":
+        db.session.delete(targeted_content)
+        db.session.commit()
+        return {"message": f"{content_type.capitalize()} Deleted"}, 200
+
+    elif request.method == "PATCH":
+        new_content_data = request.get_json()
+        update_content_from_data(targeted_content, new_content_data)
+        db.session.commit()
+        return {"message": f"{content_type.capitalize()} Updated"}, 200
+
+
+# Views
 @app.route("/")
 def index():
     return "<h1>Project Server</h1>"
@@ -52,85 +102,16 @@ def logout():
 
 
 @app.route("/videos/<int:video_id>", methods=["DELETE", "PATCH"])
-def delete_video(video_id):
-    user_id = session.get("user_id")
-    if not user_id:
-        return {"message": "Unauthorized Request"}, 401
-    if not video_id:
-        return {"message": "Video ID not provided."}, 400
-
-    targeted_video = Content.query.filter_by(id=video_id).first()
-
-    if not targeted_video or targeted_video.user_id != user_id:
-        return {"message": "No video found or unauthorized access."}, 403
-
-    if request.method == "DELETE":
-        db.session.delete(targeted_video)
-        db.session.commit()
-
-        return {"message": "Video Deleted"}, 200
-
-    elif request.method == "PATCH":
-        new_content_data = request.get_json()
-        if "title" in new_content_data:
-            targeted_video.title = new_content_data["title"]
-        if "_thumbnail" in new_content_data:
-            targeted_video._thumbnail = new_content_data["_thumbnail"]
-        if "_creator" in new_content_data:
-            targeted_video._creator = new_content_data["_creator"]
-        if "url" in new_content_data:
-            targeted_video.url = new_content_data["url"]
-        if "thumbnail" in new_content_data:
-            targeted_video.thumbnail = new_content_data["thumbnail"]
-        if "type" in new_content_data:
-            targeted_video.type = new_content_data["type"]
-        if "created_at" in new_content_data:
-            created_at_str = new_content_data.get("created_at")
-
-            if created_at_str:
-                try:
-                    created_at_date = datetime.strptime(
-                        created_at_str, "%Y-%m-%d"
-                    ).date()
-                    created_at = datetime.combine(created_at_date, datetime.min.time())
-                except ValueError as e:
-                    print(f"Error parsing date: {e}")
-                    created_at = None
-            else:
-                created_at = None
-            targeted_video.created_at = created_at
-        db.session.commit()
-        return {"message": "Video Updated"}, 200
+def handle_video(video_id):
+    return handle_content(video_id, content_type="video")
 
 
 @app.route("/articles/<int:article_id>", methods=["DELETE", "PATCH"])
-def delete_article(article_id):
-    user_id = session.get("user_id")
-    if not user_id:
-        return {"message": "Unauthorized Request"}, 401
-    if not article_id:
-        return {"message": "Article ID not provided."}, 400
-
-    targeted_article = Content.query.filter_by(id=article_id).first()
-
-    if not targeted_article or targeted_article.user_id != user_id:
-        return {"message": "No article found or unauthorized access."}, 403
-
-    if request.method == "DELETE":
-        db.session.delete(targeted_article)
-        db.session.commit()
-
-        return {"message": "articled Deleted"}, 200
-
-    elif request.method == "PATCH":
-        new_content_data = request.get_json()
-        for key, value in new_content_data.items():
-            if value:
-                setattr(targeted_article, key, value)
-        db.session.commit()
-        return {"message": "Article Updated"}, 200
+def handle_article(article_id):
+    return handle_content(article_id, content_type="article")
 
 
+# Resources
 class CheckSession(Resource):
     def get(self):
         user_id = session.get("user_id")
