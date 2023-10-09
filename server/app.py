@@ -3,10 +3,9 @@
 # Standard library imports
 
 # Remote library imports
-from flask import request, session, make_response, jsonify
+from flask import request, session, jsonify
 from flask_restful import Resource
 from datetime import datetime
-from sqlalchemy import and_
 
 # Local imports
 from config import app, db, api
